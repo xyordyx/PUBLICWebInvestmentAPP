@@ -46,6 +46,7 @@ public class FinSmartInvestor implements Callable<Investment> {
             try {
                 System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " scheduled - " + getTime());
                 TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime));
+                System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " was awakened - " + getTime());
             } catch (ParseException e) {
@@ -53,6 +54,7 @@ public class FinSmartInvestor implements Callable<Investment> {
             }
         }
         start = Instant.now();
+        System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
         while (!queueStr.isCancelled()) {
             if(minutesElapsed(start, Instant.now()) >= 15){
                 System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+

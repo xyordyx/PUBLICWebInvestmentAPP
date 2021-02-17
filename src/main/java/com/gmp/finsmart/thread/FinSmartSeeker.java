@@ -36,6 +36,7 @@ public class FinSmartSeeker extends Thread {
             try {
                 System.out.println(Thread.currentThread().getName() + ":Seeker - scheduled - " + getTime());
                 TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime));
+                System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName() + "Seeker - was awakened - " + getTime());
             } catch (ParseException e) {
@@ -44,6 +45,7 @@ public class FinSmartSeeker extends Thread {
         }
         start = Instant.now();
         List<Opportunities> jsonList;
+        System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
         while (queueStr.getActualSize()!=0 && !queueStr.isCancelled()) {
             synchronized (queueStr) {
                 if (queueStr.getQueue().size() > 0) {
