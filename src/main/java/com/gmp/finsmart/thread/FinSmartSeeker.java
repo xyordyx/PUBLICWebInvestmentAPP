@@ -65,7 +65,6 @@ public class FinSmartSeeker extends Thread {
                 break;
             }
             try {
-                System.out.println(Thread.currentThread().getName()+": Seeker - Opportunities were not found - " + getTime());
                 TimeUnit.MILLISECONDS.sleep(timeRequest);
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
