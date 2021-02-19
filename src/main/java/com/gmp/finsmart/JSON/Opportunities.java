@@ -25,6 +25,20 @@ public class Opportunities {
     @Transient
     private Debtor debtor;
 
+    @Override
+    public String toString() {
+        return "Opportunities{" +
+                "tem=" + tem +
+                ", currency='" + currency + '\'' +
+                ", v1IdGroup=" + v1IdGroup +
+                ", _id='" + _id + '\'' +
+                ", physicalInvoices=" + physicalInvoices +
+                ", availableBalanceAmount=" + availableBalanceAmount +
+                ", debtorCompanyName='" + debtorCompanyName + '\'' +
+                ", debtor=" + debtor +
+                '}';
+    }
+
     @JsonCreator
     public Opportunities(@JsonProperty("tem") double tem, @JsonProperty("currency") String currency,
                          @JsonProperty("v1IdGroup") int v1IdGroup, @JsonProperty("_id") String _id,

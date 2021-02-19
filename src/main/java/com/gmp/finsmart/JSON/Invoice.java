@@ -13,6 +13,15 @@ public class Invoice {
     @Transient
     private String _id;
 
+    @Override
+    public String toString() {
+        return "Invoice{" +
+                "debtorCompanyName='" + debtorCompanyName + '\'' +
+                ", physicalInvoices=" + physicalInvoices +
+                ", _id='" + _id + '\'' +
+                '}';
+    }
+
     @JsonGetter("debtorCompanyName")
     public String getDebtorCompanyName() {
         return debtorCompanyName;

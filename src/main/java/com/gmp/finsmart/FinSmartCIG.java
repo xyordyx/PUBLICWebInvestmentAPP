@@ -9,7 +9,12 @@ import com.gmp.persistence.model.SmartUser;
 import com.gmp.web.dto.SmartUserDto;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+
+import okhttp3.*;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -21,17 +26,19 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.gmp.hmviking.InvestmentUtil.readResponse;
 
 
-public class FinSmartCIG {
+public class FinSmartCIG{
     private static String authenticationPath="/authentications";
     private static String opportunitiesPath="/opportunities";
     private static String financialTransactionsPath="/financial-transactions";
@@ -127,7 +134,7 @@ public class FinSmartCIG {
         return invoiceTransactions;
     }
 
-    public static List<Opportunities> getOpportunitiesJSON1(String token) {
+    public static List<Opportunities> getOpportunitiesJSON1(String token,int timeRequest) {
         DefaultHttpClient httpClient = new DefaultHttpClient();
         String stringResponse;
         List<Opportunities> opportunities = new ArrayList<>();
@@ -154,6 +161,27 @@ public class FinSmartCIG {
         return opportunities;
     }
 
+    public static List<Opportunities> getOpportunities2(String token, int timeRequest){
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .connectTimeout(timeRequest, TimeUnit.MILLISECONDS)
+                .readTimeout(timeRequest, TimeUnit.MILLISECONDS)
+                //.writeTimeout(timeRequest, TimeUnit.MILLISECONDS)
+                .build();
+        Request request = new Request.Builder()
+                .url(smartURLv1+opportunitiesPath)
+                .method("GET", null)
+                .addHeader("Authorization", "Bearer "+token)
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            Type founderListType = new TypeToken<ArrayList<Opportunities>>(){}.getType();
+            return gson.fromJson(response.body().string(), founderListType);
+        } catch (IllegalStateException | JsonSyntaxException | IOException exception) {
+            System.out.println("JsonSyntaxException: "+exception);
+        }
+        return null;
+    }
+
     public static List<Opportunities> getOpportunitiesJSON(String token, int timeRequest) {
         URL url;
         try {
@@ -165,13 +193,12 @@ public class FinSmartCIG {
             con.setRequestProperty("Content-Type", "application/json");
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Authorization", "Bearer "+token);
-            con.setDoOutput(true);
             Type founderListType = new TypeToken<ArrayList<Opportunities>>(){}.getType();
             return gson.fromJson(readResponse(con).toString(), founderListType);
         } catch (MalformedURLException | ProtocolException e ) {
             e.printStackTrace();
         }  catch (SocketTimeoutException e) {
-            System.out.println("More than " + timeRequest + " elapsed.");
+            System.out.println("More than " + timeRequest + "milliseconds elapsed on request");
         }catch (Throwable e) {
             System.out.println(e);
         }
