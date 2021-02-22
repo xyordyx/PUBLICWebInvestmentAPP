@@ -20,14 +20,17 @@ public class FinSmartSeeker extends Thread {
     private LoginJSON loginJSON;
     private String scheduleTime;
     private int timeRequest;
+    private boolean sleep;
 
     private int i=0;
 
-    public FinSmartSeeker(QueueStructure queueStr, LoginJSON loginJSON, String scheduleTime, int timeRequest){
+    public FinSmartSeeker(QueueStructure queueStr, LoginJSON loginJSON, String scheduleTime, int timeRequest,
+                          boolean sleep){
         this.queueStr = queueStr;
         this.loginJSON = loginJSON;
         this.scheduleTime = scheduleTime;
         this.timeRequest = timeRequest;
+        this.sleep = sleep;
     }
 
     @Override
@@ -70,12 +73,14 @@ public class FinSmartSeeker extends Thread {
                 System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped after 15 minutes - " + getTime());
                 break;
             }
-            try {
-                TimeUnit.MILLISECONDS.sleep(timeRequest);
-                //System.out.println(Thread.currentThread().getName()+ getTime());
-            } catch (InterruptedException e) {
-                System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
-                break;
+            if(!sleep){
+                try {
+                    TimeUnit.MILLISECONDS.sleep(timeRequest);
+                    //System.out.println(Thread.currentThread().getName()+ getTime());
+                } catch (InterruptedException e) {
+                    System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
+                    break;
+                }
             }
         }
     }

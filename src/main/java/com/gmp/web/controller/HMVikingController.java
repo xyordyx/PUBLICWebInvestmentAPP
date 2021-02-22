@@ -78,7 +78,7 @@ public class HMVikingController {
         QueueStructure queueStructure = new QueueStructure(investmentBlockInv.getInvestmentList().size());
         if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
             FinSmartSeeker seeker = new FinSmartSeeker(queueStructure, loginJSON, investmentBlockInv.getScheduledTime(),
-                    investmentBlockInv.getTimeRequest());
+                    investmentBlockInv.getTimeRequest(),investmentBlockInv.isSleep());
             updaterFin = new FinSmartUpdater(seeker, investmentBlockInv.getScheduledTime());
             pool.execute(seeker);
             pool.execute(updaterFin);
@@ -281,6 +281,7 @@ public class HMVikingController {
             investmentBlockInv.setTimeRequest((int)(Double.parseDouble(investmentForm.getTimeRequest())*1000));
         }else investmentBlockInv.setTimeRequest(500);
         investmentBlockInv.setScheduled(false);
+        investmentBlockInv.setSleep(investmentForm.isSleep());
         session.setAttribute("finSmartCollection", investmentBlockInv);
         return "redirect:/waitForInvoice";
     }

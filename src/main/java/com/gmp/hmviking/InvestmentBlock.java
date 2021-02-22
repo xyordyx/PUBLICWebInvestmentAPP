@@ -20,6 +20,16 @@ public class InvestmentBlock {
     private String system;
     @Transient
     private int timeRequest;
+    @Transient
+    private boolean sleep;
+
+    public boolean isSleep() {
+        return sleep;
+    }
+
+    public void setSleep(boolean sleep) {
+        this.sleep = sleep;
+    }
 
     public int getTimeRequest() {
         return timeRequest;

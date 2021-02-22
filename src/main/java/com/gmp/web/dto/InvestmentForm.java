@@ -14,6 +14,16 @@ public class InvestmentForm {
     private String scheduledTime;
     @NotNull @NotEmpty
     private String timeRequest;
+    @NotNull @NotEmpty
+    private boolean sleep;
+
+    public boolean isSleep() {
+        return sleep;
+    }
+
+    public void setSleep(boolean sleep) {
+        this.sleep = sleep;
+    }
 
     public String getTimeRequest() {
         return timeRequest;
