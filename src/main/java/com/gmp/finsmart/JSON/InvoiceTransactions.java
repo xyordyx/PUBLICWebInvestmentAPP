@@ -32,6 +32,16 @@ public class InvoiceTransactions {
     private Debtor debtor;
     @Transient
     private long pastDueDays;
+    @Transient
+    private int moraDays;
+
+    public int getMoraDays() {
+        return moraDays;
+    }
+
+    public void setMoraDays(int moraDays) {
+        this.moraDays = moraDays;
+    }
 
     @JsonGetter("pastDueDays")
     public long getPastDueDays() {

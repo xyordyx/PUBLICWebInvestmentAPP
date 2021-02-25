@@ -435,7 +435,7 @@
                                                             <td class="bg-danger text-white">${invest.value.invoiceAppend.debtor.companyName} - ${invest.value.invoiceAppend.debtor.companyRuc}</td>
                                                             <td class="bg-danger text-white"><fmt:formatDate value="${invest.value.invoiceAppend.paymentDate}" pattern="dd-MM-yyyy" /></td>
                                                             <td class="bg-danger text-white"><fmt:formatDate value="${invest.value.invoiceAppend.createdAt}" pattern="dd-MM-yyyy" /></td>
-                                                            <td class="bg-danger text-white">0</td>
+                                                            <td class="bg-danger text-white">-${invest.value.invoiceAppend.moraDays}</td>
                                                             <c:choose>
                                                                 <c:when test="${invest.value.currency == 'pen'}">
                                                                     <td class="bg-danger text-white">PEN ${invest.value.amount}</td>
