@@ -61,10 +61,11 @@ public class FinSmartSeeker extends Thread {
                     if (jsonList.size() > 0) {
                         queueStr.getQueue().add(jsonList);
                         queueStr.notifyAll();
-                        if(temp != jsonList.size()){
+                        System.out.println(Thread.currentThread().getName()+": Seeker - Added opportunities to queue - " + getTime());
+                        /*if(temp != jsonList.size()){
                             temp = jsonList.size();
                             System.out.println(Thread.currentThread().getName()+": Seeker - Added opportunities to queue - " + getTime());
-                        }
+                        }*/
                     }
                 }
                 i++;
