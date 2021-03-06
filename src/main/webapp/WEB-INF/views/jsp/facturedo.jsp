@@ -209,6 +209,18 @@
                                                 <input type="text" data-masked="" name="scheduledTime" data-inputmask="'mask': '99:99'" id="customTime" placeholder="Custom Time" class="form-control">
                                             </div>
                                         </div>
+
+                                        <div class="form-group form-check form-check-inline">
+                                            <div class="input-group form-group">
+                                                <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                                <input type="text" data-masked="" name="timeRequest" data-inputmask="'mask': '9.99'" id="timeRequest" placeholder="Time Request" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group mb-0 form-check-inline">
+                                            <input type="checkbox" id="sleep" name="sleep">
+                                            <label for="sleep" class="redial-dark">Remove Thread Sleep</label>
+                                        </div>
                                         <button type="submit" class="btn btn-block p-2 btn-outline-warning shadowed"><i class="fa fa-sheqel pr-2"></i>Invest!</button>
                                     </form>
                             </div>

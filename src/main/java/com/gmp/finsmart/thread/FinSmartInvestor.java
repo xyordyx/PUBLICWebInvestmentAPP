@@ -56,14 +56,6 @@ public class FinSmartInvestor implements Callable<Investment> {
         start = Instant.now();
         System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
         while (!queueStr.isCancelled()) {
-            if(minutesElapsed(start, Instant.now()) >= 15){
-                System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+
-                        " investor stopped after 15 minutes - "+getTime());
-                investment.setStatus("false");
-                investment.setMessage("Invoice could not be found");
-                reportService.updateInvestmentStatus(investment,userId,systemId);
-                return investment;
-            }
             synchronized (queueStr) {
                 if(queueStr.getQueue().size() > 0){
                     if(queueStr.getQueue().element().size() > 0){
@@ -101,6 +93,14 @@ public class FinSmartInvestor implements Callable<Investment> {
                             +" investor was stopped - "+getTime());
                     break;
                 }*/
+            }
+            if(minutesElapsed(start, Instant.now()) >= 15){
+                System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+
+                        " investor stopped after 15 minutes - "+getTime());
+                investment.setStatus("false");
+                investment.setMessage("Invoice could not be found");
+                reportService.updateInvestmentStatus(investment,userId,systemId);
+                return investment;
             }
         }
         return null;

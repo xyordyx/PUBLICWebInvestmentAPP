@@ -83,7 +83,8 @@ public class HMVikingController {
             pool.execute(seeker);
             pool.execute(updaterFin);
         }else{
-            FacturedoSeeker seeker = new FacturedoSeeker(queueStructure,loginJSON, investmentBlockInv.getScheduledTime());
+            FacturedoSeeker seeker = new FacturedoSeeker(queueStructure,loginJSON, investmentBlockInv.getScheduledTime(),
+                    investmentBlockInv.getTimeRequest(),investmentBlockInv.isSleep());
             updaterFact = new FacturedoUpdater(seeker, investmentBlockInv.getScheduledTime());
             pool.execute(seeker);
             pool.execute(updaterFact);
@@ -101,7 +102,8 @@ public class HMVikingController {
                 listOfThreads.add(futureCounterResult);
             }else{
                 Callable<Investment> callableInvestor = new FacturedoInvestor(queueStructure,investment,loginJSON,
-                        investmentBlockInv.getScheduledTime(), reportService, userId, investmentBlockInv.getSystem());
+                        investmentBlockInv.getScheduledTime(), reportService, userId, investmentBlockInv.getSystem(),
+                        investmentBlockInv.getTimeRequest());
                 Future<Investment> futureCounterResult = pool.submit(callableInvestor);
                 listOfThreads.add(futureCounterResult);
             }

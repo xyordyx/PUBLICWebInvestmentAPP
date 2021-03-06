@@ -3,6 +3,7 @@ package com.gmp.facturedo;
 import com.gmp.facturedo.JSON.Auctions;
 import com.gmp.facturedo.JSON.AuctionsDeposits;
 import com.gmp.facturedo.JSON.Balance;
+import com.gmp.finsmart.JSON.Opportunities;
 import com.gmp.hmviking.LoginJSON;
 import com.gmp.persistence.model.FactUser;
 import com.gmp.web.dto.FactUserDto;
@@ -12,12 +13,15 @@ import com.google.gson.GsonBuilder;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
 import org.json.simple.JSONObject;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.lang.reflect.Type;
+import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.gmp.hmviking.InvestmentUtil.readResponse;
@@ -80,6 +84,28 @@ public class FacturedoCIG {
         }
         System.out.print("Response from Facturedo: "+responseJSON.toString());
         return responseJSON;
+    }
+
+    public static Auctions getOpportunitiesJSON(LoginJSON loginJSON, int timeRequest) {
+        URL url;
+        try {
+            url = new URL(factOpportunities);
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("GET");
+            con.setConnectTimeout(timeRequest);
+            con.setReadTimeout(timeRequest);
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("Authorization", "JWT "+loginJSON.getToken());
+            return gson.fromJson(readResponse(con).toString(), Auctions.class);
+        } catch (MalformedURLException | ProtocolException e ) {
+            e.printStackTrace();
+        }  catch (SocketTimeoutException e) {
+            System.out.println("More than " + timeRequest + "milliseconds elapsed on request");
+        }catch (Throwable e) {
+            System.out.println(e);
+        }
+        return null;
     }
 
     public static Auctions getOpportunitiesJSON(LoginJSON loginJSON) {

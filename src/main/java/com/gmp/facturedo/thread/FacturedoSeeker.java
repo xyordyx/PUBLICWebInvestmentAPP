@@ -18,13 +18,18 @@ public class FacturedoSeeker extends Thread {
     Instant start = null;
     private LoginJSON loginJSON;
     private String scheduleTime;
+    private int timeRequest;
+    private boolean sleep;
 
     private int i=0;
 
-    public FacturedoSeeker(QueueStructure queueStr, LoginJSON loginJSON, String scheduleTime){
+    public FacturedoSeeker(QueueStructure queueStr, LoginJSON loginJSON, String scheduleTime, int timeRequest,
+                           boolean sleep){
         this.queueStr = queueStr;
         this.loginJSON = loginJSON;
         this.scheduleTime = scheduleTime;
+        this.timeRequest = timeRequest;
+        this.sleep = sleep;
     }
 
     @Override
@@ -33,6 +38,7 @@ public class FacturedoSeeker extends Thread {
             try {
                 System.out.println(Thread.currentThread().getName() + "FactuSeeker - scheduled - " + getTime());
                 TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime));
+                System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName() + "FactuSeeker - was awakened - " + getTime());
             } catch (ParseException e) {
@@ -41,31 +47,40 @@ public class FacturedoSeeker extends Thread {
         }
         start = Instant.now();
         List<Results> jsonList;
+        int temp = 0;
+        System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
         while (queueStr.getActualSize()!=0 && !queueStr.isCancelled()) {
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                System.out.println(Thread.currentThread().getName()+": FactuSeeker - OP seeker stopped - " + getTime());
-                break;
-            }
-            if (minutesElapsed(start, Instant.now()) >= 15) {
-                System.out.println(Thread.currentThread().getName()+": FactuSeeker - OP seeker stopped after 15 minutes - " + getTime());
-                break;
-            }
             synchronized (queueStr) {
                 if (queueStr.getQueueResults().size() > 0) {
-                    queueStr.getQueueResults().remove();
+                    queueStr.getQueueResults().clear();
                 }
-                jsonList = getOpportunitiesJSON(loginJSON).getResults();
+                jsonList = getOpportunitiesJSON(loginJSON,timeRequest).getResults();
                 //jsonList = FacturedoUtil.getOpportunities(i).getResults();
                 if(jsonList != null) {
                     if (jsonList.size() > 0) {
                         queueStr.getQueueResults().add(jsonList);
                         System.out.println(Thread.currentThread().getName()+": FactuSeeker - Added opportunities to queue - " + getTime());
                         queueStr.notifyAll();
-                    } else System.out.println("No opportunities were found - " + getTime());
+                         /*if(temp != jsonList.size()){
+                            temp = jsonList.size();
+                            System.out.println(Thread.currentThread().getName()+": Seeker - Added opportunities to queue - " + getTime());
+                        }*/
+                    }
                 }
                 i++;
+            }
+            if (minutesElapsed(start, Instant.now()) >= 15) {
+                System.out.println(Thread.currentThread().getName()+": FactuSeeker - OP seeker stopped after 15 minutes - " + getTime());
+                break;
+            }
+            if(!sleep){
+                try {
+                    TimeUnit.MILLISECONDS.sleep(timeRequest);
+                    //System.out.println(Thread.currentThread().getName()+ getTime());
+                } catch (InterruptedException e) {
+                    System.out.println(Thread.currentThread().getName()+": FactuSeeker - OP seeker stopped - " + getTime());
+                    break;
+                }
             }
         }
     }
