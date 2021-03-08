@@ -432,7 +432,7 @@
                                             <tbody>
                                             <c:forEach var="invest" items="${factuInvestments}">
                                                 <tr>
-                                                    <td>${invest.debtor.official_name}</td>
+                                                    <td>${invest.debtor.official_name} - ${invest.businessRel.debtor_ruc}</td>
                                                     <td><fmt:formatDate value="${invest.payment_date}" pattern="dd-MM-yyyy" /></td>
                                                     <td><fmt:formatDate value="${invest.investment_date}" pattern="dd-MM-yyyy" /></td>
                                                     <td>${invest.toBeCollectedIn}</td>
@@ -503,14 +503,14 @@
                                             </tr>
                                             </tfoot>
                                             <tbody>
-                                            <c:forEach var="invest" items="${finalizedInv}">
+                                            <c:forEach var="invest" items="${factuFinalizedInv.results}">
                                                 <tr>
-                                                    <td>${invest.debtor.companyName} - ${invest.debtor.companyRuc}</td>
-                                                    <td><fmt:formatDate value="${invest.paymentDate}" pattern="dd-MM-yyyy" /></td>
-                                                    <td><fmt:formatDate value="${invest.actualPaymentDate}" pattern="dd-MM-yyyy" /></td>
-                                                    <td>${invest.pastDueDays}</td>
-                                                    <td><fmt:formatDate value="${invest.createdAt}" pattern="dd-MM-yyyy" /></td>
-                                                    <td>${invest.tem}</td>
+                                                    <td>${invest.debtor.official_name} - ${invest.businessRel.debtor_ruc}</td>
+                                                    <td>NA</td>
+                                                    <td><fmt:formatDate value="${invest.payment_date}" pattern="dd-MM-yyyy" /></td>
+                                                    <td>NA</td>
+                                                    <td><fmt:formatDate value="${invest.investment_date}" pattern="dd-MM-yyyy" /></td>
+                                                    <td>${invest.discount_rate}</td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>

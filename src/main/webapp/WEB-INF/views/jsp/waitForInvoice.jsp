@@ -28,7 +28,10 @@
 
 <nav class="navbar navbar-expand-lg bg-transparent navbar-dark">
     <div class="container">
-        <a class="navbar-brand" title="Designed by GMP" data-placement="bottom" data-toggle="tooltip" href="/admin">FINSMART APP</a>
+        <div class="site-logo">
+            <a class="navbar-brand text-warning" title="Designed by GMP" data-placement="bottom" data-toggle="tooltip" href="/landing">
+                <img src="${contextPath}/resources/s2/dist/images/HMViking.png" width="50" height="50" alt="" class="img-fluid"/> HM Viking</a>
+        </div>
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNowUIKitFree">
             <span class="navbar-toggler-icon"></span>
         </button>

@@ -319,7 +319,8 @@ public class HMVikingController {
         model.addAttribute("totalDepositsUSD", factuData.getInvestedJSON().getUSD());
 
         session.setAttribute("latestInvestments",reportService.getAllByUserAndSystemId(userId,investmentBlockInv.getSystem()));
-        session.setAttribute("factuInvestments",reportService.getProcessedResultsFactu(factuData).getResultsInProgress());
+        session.setAttribute("factuInvestments",reportService.getProcessedResultsFactu(factuData,loginJSON).getResultsInProgress());
+        session.setAttribute("factuFinalizedInv",reportService.getFactuFinalizedInvoices(loginJSON));
         model.addAttribute("expectedProfitPEN", formatter.format(factuData.getSolesProfitExpected()));
         model.addAttribute("expectedProfitUSD", formatter.format(factuData.getDollarProfitExpected()));
 

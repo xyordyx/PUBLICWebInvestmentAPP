@@ -4,6 +4,7 @@ import com.gmp.facturedo.JSON.*;
 import com.gmp.finsmart.JSON.FinancialTransactions;
 import com.gmp.finsmart.JSON.FinsmartData;
 import com.gmp.finsmart.JSON.InvoiceTransactions;
+import com.gmp.hmviking.LoginJSON;
 import com.gmp.persistence.model.HistoricalData;
 import com.gmp.persistence.model.LastInvestmentsStatus;
 import com.gmp.persistence.model.User;
@@ -27,7 +28,9 @@ public interface IReportService {
 
     List<LastInvestmentsStatus> getAllByUserAndSystemId(User user, String systemId);
 
-    FacturedoData getProcessedResultsFactu(FacturedoData factuData);
+    FacturedoData getProcessedResultsFactu(FacturedoData factuData,LoginJSON loginJSON);
 
     Invested getProcessedBalance(AuctionsDeposits auctions);
+
+    Auctions getFactuFinalizedInvoices(LoginJSON loginJSON);
 }

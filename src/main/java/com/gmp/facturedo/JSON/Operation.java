@@ -14,6 +14,16 @@ public class Operation {
     private Date payment_date;
     @Transient
     private int status;
+    @Transient
+    private String business_relationship;
+
+    public String getBusiness_relationship() {
+        return business_relationship;
+    }
+
+    public void setBusiness_relationship(String business_relationship) {
+        this.business_relationship = business_relationship;
+    }
 
     public int getStatus() {
         return status;

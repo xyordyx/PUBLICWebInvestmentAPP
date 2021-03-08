@@ -3,7 +3,7 @@ package com.gmp.facturedo;
 import com.gmp.facturedo.JSON.Auctions;
 import com.gmp.facturedo.JSON.AuctionsDeposits;
 import com.gmp.facturedo.JSON.Balance;
-import com.gmp.finsmart.JSON.Opportunities;
+import com.gmp.facturedo.JSON.BusinessRel;
 import com.gmp.hmviking.LoginJSON;
 import com.gmp.persistence.model.FactUser;
 import com.gmp.web.dto.FactUserDto;
@@ -13,15 +13,11 @@ import com.google.gson.GsonBuilder;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
 import org.json.simple.JSONObject;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.gmp.hmviking.InvestmentUtil.readResponse;
@@ -37,6 +33,8 @@ public class FacturedoCIG {
     private static String factOpportunities ="https://fact2-api-prod.herokuapp.com/v2/auctions?page=1&operation__status=6&status=1&embed=operation,tir,percentage_completed,gross_advance_amount,debtor";
     private static String factInvestments = "https://fact2-api-prod.herokuapp.com/v2/a209f254-0ab1-4288-b487-9f0868e88af5/investments?page=1&status=on_time&ordering=-modified_dt&embed=debtor,operation,repaid_amount,payment_date";
     private static String factBalanceTransactionURL = "https://fact2-api-prod.herokuapp.com/v1/biz/balance-transactions";
+    private static String factCompletedInvestments = "https://fact2-api-prod.herokuapp.com/v2/a209f254-0ab1-4288-b487-9f0868e88af5/investments?page=1&status=paid&ordering=-modified_dt&embed=debtor,operation,repaid_amount,payment_date";
+    private static String factBusinessRel = "https://fact2-api-prod.herokuapp.com/v1/biz/business-rels/";
 
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -216,6 +214,50 @@ public class FacturedoCIG {
             String resp = response.body().string();
             response.close();;
             return gson.fromJson(resp, Auctions.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Auctions getCompletedInvestJSON(LoginJSON loginJSON) {
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(120, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .build();
+        Request request = new Request.Builder()
+                .url(factCompletedInvestments)
+                .method("GET", null)
+                .addHeader("Authorization", "JWT "+loginJSON.getToken())
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            String resp = response.body().string();
+            response.close();;
+            return gson.fromJson(resp, Auctions.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static BusinessRel getBusinessRel(LoginJSON loginJSON, String businessRel) {
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(120, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .build();
+        Request request = new Request.Builder()
+                .url(factBusinessRel+businessRel)
+                .method("GET", null)
+                .addHeader("Authorization", "JWT "+loginJSON.getToken())
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            String resp = response.body().string();
+            response.close();;
+            return gson.fromJson(resp, BusinessRel.class);
         } catch (IOException e) {
             e.printStackTrace();
         }

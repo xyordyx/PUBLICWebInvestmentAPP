@@ -3,6 +3,7 @@ package com.gmp.service;
 import com.gmp.facturedo.JSON.*;
 import com.gmp.finsmart.JSON.*;
 import com.gmp.finsmart.FinSmartUtil;
+import com.gmp.hmviking.LoginJSON;
 import com.gmp.persistence.dao.HistoricalDataRepository;
 import com.gmp.persistence.dao.HistoricalDataStatusRepository;
 import com.gmp.persistence.dao.LastInvestmentsStatusRepository;
@@ -21,7 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static com.gmp.facturedo.FacturedoCIG.getInvestmentsJSON;
+import static com.gmp.facturedo.FacturedoCIG.*;
 
 @Service
 @Transactional
@@ -371,20 +372,31 @@ public class ReportService implements IReportService{
         return finalized;
     }
 
+    @Override
+    public Auctions getFactuFinalizedInvoices(LoginJSON loginJSON){
+        Auctions act = getCompletedInvestJSON(loginJSON);
+        for(Results results : act.getResults()){
+            results.setBusinessRel(getBusinessRel(loginJSON,results.getOperation().getBusiness_relationship()));
+        }
+        return act;
+    }
+
     public long getDuePastDays(InvoiceTransactions inv){
         long diffInMillis = Math.abs(inv.getActualPaymentDate().getTime() - inv.getPaymentDate().getTime());
         return TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public FacturedoData getProcessedResultsFactu(FacturedoData factuData){
-        for(Results results : getInvestmentsJSON(factuData.getLoginJSON()).getResults()){
+    public FacturedoData getProcessedResultsFactu(FacturedoData factuData,LoginJSON loginJSON){
+        List<Results> rst = getInvestmentsJSON(factuData.getLoginJSON()).getResults();
+        for(Results results : rst){
             results.setToBeCollectedIn(getPendingToCollection(results.getPayment_date()));
             results.setTotalInvestedDays(getInvestedTotalDays(results.getPayment_date(),results.getInvestment_date()));
             results.setProfit(getExpectedProfit(results));
             if(results.getCurrency().equals("PEN")){
                 factuData.setSolesProfitExpected(factuData.getSolesProfitExpected() + results.getProfit());
             }else factuData.setDollarProfitExpected(factuData.getDollarProfitExpected() + results.getProfit());
+            results.setBusinessRel(getBusinessRel(loginJSON,results.getOperation().getBusiness_relationship()));
             factuData.getResultsInProgress().add(results);
         }
         return factuData;

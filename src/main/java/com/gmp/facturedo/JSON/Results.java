@@ -34,6 +34,16 @@ public class Results {
     private int status;
     @Transient
     private String currency;
+    @Transient
+    private BusinessRel businessRel;
+
+    public BusinessRel getBusinessRel() {
+        return businessRel;
+    }
+
+    public void setBusinessRel(BusinessRel businessRel) {
+        this.businessRel = businessRel;
+    }
 
     public String getCurrency() {
         return currency;
