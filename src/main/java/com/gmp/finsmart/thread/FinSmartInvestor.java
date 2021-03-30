@@ -57,6 +57,12 @@ public class FinSmartInvestor implements Callable<Investment> {
         System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
         while (!queueStr.isCancelled()) {
             synchronized (queueStr) {
+                try {
+                    queueStr.wait();
+                } catch (InterruptedException e) {
+                    System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
+                    break;
+                }
                 if(queueStr.getQueue().size() > 0){
                     if(queueStr.getQueue().element().size() > 0){
                         investment = FinSmartUtil.waitForInvoiceInvest(queueStr.getQueue().element(), investment);
@@ -84,12 +90,6 @@ public class FinSmartInvestor implements Callable<Investment> {
                     System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
                     break;
                 }*/
-                try {
-                    queueStr.wait();
-                } catch (InterruptedException e) {
-                    System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
-                    break;
-                }
             }
             if(minutesElapsed(start, Instant.now()) >= 15){
                 System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+

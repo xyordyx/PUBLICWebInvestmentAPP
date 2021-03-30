@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.gmp.hmviking.InvestmentUtil.getTime;
 import static com.gmp.hmviking.InvestmentUtil.readResponse;
 
 
@@ -73,7 +74,7 @@ public class FinSmartCIG{
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 responseJSON = objectMapper.readValue(json,ResponseJSON.class);
-                System.out.println("FINSMART ERROR RESPONSE: "+responseJSON.getMessage());
+                System.out.println("FINSMART ERROR RESPONSE: "+responseJSON.getMessage() + " - "+getTime());
             }
             client.close();
         } catch (UnsupportedEncodingException e) {

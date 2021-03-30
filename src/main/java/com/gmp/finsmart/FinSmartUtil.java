@@ -681,13 +681,13 @@ public class FinSmartUtil {
 
     public static List<Opportunities> getOpportunities(int i){
         Type founderListType = new TypeToken<ArrayList<Opportunities>>(){}.getType();
-        if(i>=4 && i <=20){
+        if(i>=20 && i <=30){
             return gson.fromJson(op2, founderListType);
         }
-        else if (i>20 && i <=40){
+        else if (i>30 && i <=50){
             return gson.fromJson(op3, founderListType);
         }
-        else if (i>40 && i <=60){
+        else if (i>50 && i <=80){
             return gson.fromJson(op4, founderListType);
         }
         else return gson.fromJson(op, founderListType);
