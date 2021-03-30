@@ -72,8 +72,6 @@ public class FinSmartInvestor implements Callable<Investment> {
                                     reportService.updateInvestmentStatus(investment,userId,systemId);
                                     return investment;
                                 }
-                                System.out.println(Thread.currentThread().getName()+":"+investment.getInvoiceNumber()+" " +
-                                        "INVESTMENT AMOUNT IS BIGGER THAN INVOICE AVAILABLE - "+getTime());
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
