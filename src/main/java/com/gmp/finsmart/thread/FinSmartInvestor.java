@@ -80,19 +80,18 @@ public class FinSmartInvestor implements Callable<Investment> {
                         }
                     }
                 }
-                try {
+                /*try {
                     TimeUnit.MILLISECONDS.sleep(timeRequest);
                 } catch (InterruptedException e) {
                     System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
                     break;
-                }
-                /*try {
+                }*/
+                try {
                     queueStr.wait();
                 } catch (InterruptedException e) {
-                    System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()
-                            +" investor was stopped - "+getTime());
+                    System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
                     break;
-                }*/
+                }
             }
             if(minutesElapsed(start, Instant.now()) >= 15){
                 System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+
