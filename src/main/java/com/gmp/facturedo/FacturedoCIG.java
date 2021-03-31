@@ -1,9 +1,6 @@
 package com.gmp.facturedo;
 
-import com.gmp.facturedo.JSON.Auctions;
-import com.gmp.facturedo.JSON.AuctionsDeposits;
-import com.gmp.facturedo.JSON.Balance;
-import com.gmp.facturedo.JSON.BusinessRel;
+import com.gmp.facturedo.JSON.*;
 import com.gmp.hmviking.LoginJSON;
 import com.gmp.persistence.model.FactUser;
 import com.gmp.web.dto.FactUserDto;
@@ -35,6 +32,7 @@ public class FacturedoCIG {
     private static String factBalanceTransactionURL = "https://fact2-api-prod.herokuapp.com/v1/biz/balance-transactions";
     private static String factCompletedInvestments = "https://fact2-api-prod.herokuapp.com/v2/a209f254-0ab1-4288-b487-9f0868e88af5/investments?page=1&status=paid&ordering=-modified_dt&embed=debtor,operation,repaid_amount,payment_date";
     private static String factBusinessRel = "https://fact2-api-prod.herokuapp.com/v1/biz/business-rels/";
+    private static String factDashboardURL = "https://fact2-api-prod.herokuapp.com/v1/factoring/buyer/a209f254-0ab1-4288-b487-9f0868e88af5/dashboard";
 
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -280,6 +278,28 @@ public class FacturedoCIG {
             String resp = response.body().string();
             response.close();;
             return gson.fromJson(resp, AuctionsDeposits.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Dashboard getDashboard(LoginJSON loginJSON){
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(120, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .build();
+        Request request = new Request.Builder()
+                .url(factDashboardURL)
+                .method("GET", null)
+                .addHeader("Authorization", "JWT "+loginJSON.getToken())
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            String resp = response.body().string();
+            response.close();;
+            return gson.fromJson(resp, Dashboard.class);
         } catch (IOException e) {
             e.printStackTrace();
         }

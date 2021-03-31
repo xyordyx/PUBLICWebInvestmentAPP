@@ -16,11 +16,8 @@ import com.gmp.persistence.dao.SmartUserRepository;
 import com.gmp.persistence.model.*;
 import com.gmp.service.IReportService;
 import com.gmp.service.IUserService;
-import com.gmp.web.dto.FactUserDto;
-import com.gmp.web.dto.Investment;
+import com.gmp.web.dto.*;
 import com.gmp.finsmart.*;
-import com.gmp.web.dto.InvestmentForm;
-import com.gmp.web.dto.SmartUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mobile.device.Device;
@@ -40,10 +37,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.gmp.facturedo.FacturedoCIG.getInvestmentsJSON;
 import static com.gmp.finsmart.FinSmartCIG.*;
 import static com.gmp.hmviking.InvestmentUtil.*;
-
 
 @Controller
 public class HMVikingController {
@@ -82,7 +77,7 @@ public class HMVikingController {
             updaterFin = new FinSmartUpdater(seeker, investmentBlockInv.getScheduledTime());
             pool.execute(seeker);
             pool.execute(updaterFin);
-        }else{
+        }else if(investmentBlockInv.getSystem().equals("HMFACTUREDO")){
             FacturedoSeeker seeker = new FacturedoSeeker(queueStructure,loginJSON, investmentBlockInv.getScheduledTime(),
                     investmentBlockInv.getTimeRequest(),investmentBlockInv.isSleep());
             updaterFact = new FacturedoUpdater(seeker, investmentBlockInv.getScheduledTime());
@@ -100,7 +95,7 @@ public class HMVikingController {
                         investmentBlockInv.getTimeRequest());
                 Future<Investment> futureCounterResult = pool.submit(callableInvestor);
                 listOfThreads.add(futureCounterResult);
-            }else{
+            }else if(investmentBlockInv.getSystem().equals("HMFACTUREDO")){
                 Callable<Investment> callableInvestor = new FacturedoInvestor(queueStructure,investment,loginJSON,
                         investmentBlockInv.getScheduledTime(), reportService, userId, investmentBlockInv.getSystem(),
                         investmentBlockInv.getTimeRequest());
@@ -184,7 +179,8 @@ public class HMVikingController {
                     flag = true;
                     simpMessagingTemplate.convertAndSend("/finSmart/investments", investmentBlockInv);
                 }
-            }else{
+            }
+            else if(investmentBlockInv.getSystem().equals("HMFACTUREDO")){
                 if(updaterFact.getQueueStr()!=null && !flag && investmentBlockInv.isScheduled()){
                     investmentBlockInv.setInvestmentList(setInProgress(investmentBlockInv.getInvestmentList()));
                     flag = true;
@@ -314,15 +310,27 @@ public class HMVikingController {
         model.addAttribute("balanceUSD", factuData.getDollarAmountAvailable());
         model.addAttribute("totalInvestedPEN", factuData.getSolesCurrentInvested());
         model.addAttribute("totalInvestedUSD", factuData.getDollarCurrentInvested());
-        factuData.setInvestedJSON(reportService.getProcessedBalance(FacturedoCIG.getBalanceTransactions(loginJSON)));
-        model.addAttribute("totalDepositsPEN", factuData.getInvestedJSON().getPEN());
-        model.addAttribute("totalDepositsUSD", factuData.getInvestedJSON().getUSD());
+        model.addAttribute("totalInvested", factuData.getSolesCurrentInvested() +
+                (factuData.getDollarCurrentInvested()*currencyFactor));
+
+        model.addAttribute("totalDepositsPEN", factuData.getSolesTotalTransferred());
+        model.addAttribute("totalDepositsUSD", factuData.getDollarTotalTransferred());
+        model.addAttribute("totalDeposits", formatter.format(factuData.getSolesTotalTransferred() +
+                (factuData.getDollarTotalTransferred()*currencyFactor)));
+
+        model.addAttribute("totalProfitPEN", factuData.getSolesTotalProfit());
+        model.addAttribute("totalProfitUSD", factuData.getDollarTotalProfit());
+        model.addAttribute("totalProfit", formatter.format(factuData.getSolesTotalProfit() +
+                (factuData.getDollarTotalProfit()*currencyFactor)));
+
+        model.addAttribute("expectedProfitPEN", factuData.getSolesProfitExpected());
+        model.addAttribute("expectedProfitUSD", factuData.getDollarProfitExpected());
+        model.addAttribute("expectedProfit", formatter.format(factuData.getSolesProfitExpected() +
+                (factuData.getDollarProfitExpected()*currencyFactor)));
 
         session.setAttribute("latestInvestments",reportService.getAllByUserAndSystemId(userId,investmentBlockInv.getSystem()));
         session.setAttribute("factuInvestments",reportService.getProcessedResultsFactu(factuData,loginJSON).getResultsInProgress());
         session.setAttribute("factuFinalizedInv",reportService.getFactuFinalizedInvoices(loginJSON));
-        model.addAttribute("expectedProfitPEN", formatter.format(factuData.getSolesProfitExpected()));
-        model.addAttribute("expectedProfitUSD", formatter.format(factuData.getDollarProfitExpected()));
 
         return "facturedo";
     }
@@ -447,4 +455,5 @@ public class HMVikingController {
             return false;
         }
     }
+
 }

@@ -30,7 +30,5 @@ public interface IReportService {
 
     FacturedoData getProcessedResultsFactu(FacturedoData factuData,LoginJSON loginJSON);
 
-    Invested getProcessedBalance(AuctionsDeposits auctions);
-
     Auctions getFactuFinalizedInvoices(LoginJSON loginJSON);
 }

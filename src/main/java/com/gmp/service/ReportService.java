@@ -61,7 +61,9 @@ public class ReportService implements IReportService{
         newRecord.setAutoAdjusted(investment.isAutoAdjusted());
         if(systemId.equals("HMFINSMART")) {
             newRecord.setRazonSocial(investment.getOpportunity().getDebtor().getCompanyName());
-        }else newRecord.setRazonSocial(investment.getResults().getDebtor().getOfficial_name());
+        }else if(systemId.equals("HMFACTUREDO")) {
+            newRecord.setRazonSocial(investment.getResults().getDebtor().getOfficial_name());
+        }
         newRecord.setSystemId(systemId);
         newRecord.setDateTime(ZonedDateTime.now(ZoneId.of("GMT-5")));
         newRecord.setUser(userId);
@@ -421,20 +423,5 @@ public class ReportService implements IReportService{
                 (1 - fee * (1 + IGV) ))* result.getAmount());
         double net = total - (total*fee) - ((total*fee)*IGV);
         return net - (IR*total);
-    }
-
-    @Override
-    public Invested getProcessedBalance(AuctionsDeposits auctions){
-        Invested total = new Invested();
-        for(ResultsDeposits results : auctions.getResults()){
-            if(results.getTransaction_type() == 1 && results.getStatus() == 3){
-                if(results.getCurrency().equals("PEN")){
-                    total.setPEN(total.getPEN() + results.getAmount());
-                }else{
-                    total.setUSD(total.getUSD() + results.getAmount());
-                }
-            }
-        }
-        return total;
     }
 }

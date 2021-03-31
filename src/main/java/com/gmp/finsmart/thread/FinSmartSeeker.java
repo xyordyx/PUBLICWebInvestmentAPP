@@ -49,6 +49,9 @@ public class FinSmartSeeker extends Thread {
         start = Instant.now();
         List<Opportunities> jsonList;
         int temp = 0;
+        if(sleep){
+            timeRequest = 0;
+        }
         System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
         while (queueStr.getActualSize()!=0 && !queueStr.isCancelled()) {
             synchronized (queueStr) {
@@ -74,16 +77,15 @@ public class FinSmartSeeker extends Thread {
                 System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped after 15 minutes - " + getTime());
                 break;
             }
-            if(!sleep){
-                try {
-                    TimeUnit.MILLISECONDS.sleep(timeRequest);
-                    //System.out.println(Thread.currentThread().getName()+ getTime());
-                } catch (InterruptedException e) {
-                    System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
-                    break;
-                }
+            try {
+                TimeUnit.MILLISECONDS.sleep(timeRequest);
+                //System.out.println(Thread.currentThread().getName()+ getTime());
+            } catch (InterruptedException e) {
+                System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
+                break;
             }
         }
+        System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
     }
 
     public QueueStructure getStatus(){

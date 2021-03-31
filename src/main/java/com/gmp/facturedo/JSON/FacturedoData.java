@@ -31,15 +31,18 @@ public class FacturedoData {
     private double dollarProfitExpected;
 
     @Transient
+    private double solesTotalTransferred;
+    @Transient
+    private double dollarTotalTransferred;
+
+    @Transient
     private List<Results> resultsInProgress;
 
 
     @Transient
     private Balance balanceJSON;
     @Transient
-    private Invested investedJSON;
-    @Transient
-    private Auctions auctionsJSON;
+    private Dashboard dashboard;
 
     public FacturedoData(LoginJSON loginJSON) {
         this.loginJSON = loginJSON;
@@ -48,6 +51,23 @@ public class FacturedoData {
         this.dollarAmountAvailable = this.balanceJSON.getAvailable().getUSD();
         this.solesCurrentInvested = this.balanceJSON.getInvested().getPEN();
         this.dollarCurrentInvested = this.balanceJSON.getInvested().getUSD();
+        this.dashboard = FacturedoCIG.getDashboard(loginJSON);
+        if(this.dashboard.getPortfolio().getEstimatedProfit().getUSD() !=null)
+        this.dollarProfitExpected = this.dashboard.getPortfolio().getEstimatedProfit().getUSD();
+        this.solesProfitExpected = this.dashboard.getPortfolio().getEstimatedProfit().getPEN();
+        if(this.dashboard.getRepaidBids().getProfit().getUSD() != null)
+        this.dollarTotalProfit = this.dashboard.getRepaidBids().getProfit().getUSD();
+        this.solesTotalProfit = this.dashboard.getRepaidBids().getProfit().getPEN();
+        if(this.dashboard.getDepositsAmount().getPEN() != null){
+            if(this.dashboard.getWithdrawalsAmount().getPEN() != null){
+                this.solesTotalTransferred = this.dashboard.getDepositsAmount().getPEN() - this.dashboard.getWithdrawalsAmount().getPEN();
+            }else this.solesTotalTransferred = this.dashboard.getDepositsAmount().getPEN();
+        }
+        if(this.dashboard.getDepositsAmount().getUSD() != null){
+            if(this.dashboard.getWithdrawalsAmount().getUSD() != null){
+                this.dollarTotalTransferred = this.dashboard.getDepositsAmount().getUSD() - this.dashboard.getWithdrawalsAmount().getUSD();
+            }else this.dollarTotalTransferred = this.dashboard.getDepositsAmount().getUSD();
+        }
         this.resultsInProgress = new ArrayList<>();
     }
 
@@ -57,38 +77,6 @@ public class FacturedoData {
 
     public void setLoginJSON(LoginJSON loginJSON) {
         this.loginJSON = loginJSON;
-    }
-
-    public Auctions getAuctionsJSON() {
-        return auctionsJSON;
-    }
-
-    public void setAuctionsJSON(Auctions auctionsJSON) {
-        this.auctionsJSON = auctionsJSON;
-    }
-
-    public Balance getBalanceJSON() {
-        return balanceJSON;
-    }
-
-    public void setBalanceJSON(Balance balanceJSON) {
-        this.balanceJSON = balanceJSON;
-    }
-
-    public Invested getInvestedJSON() {
-        return investedJSON;
-    }
-
-    public void setInvestedJSON(Invested investedJSON) {
-        this.investedJSON = investedJSON;
-    }
-
-    public List<Results> getResultsInProgress() {
-        return resultsInProgress;
-    }
-
-    public void setResultsInProgress(List<Results> resultsInProgress) {
-        this.resultsInProgress = resultsInProgress;
     }
 
     public double getSolesAmountAvailable() {
@@ -153,5 +141,45 @@ public class FacturedoData {
 
     public void setDollarProfitExpected(double dollarProfitExpected) {
         this.dollarProfitExpected = dollarProfitExpected;
+    }
+
+    public double getSolesTotalTransferred() {
+        return solesTotalTransferred;
+    }
+
+    public void setSolesTotalTransferred(double solesTotalTransferred) {
+        this.solesTotalTransferred = solesTotalTransferred;
+    }
+
+    public double getDollarTotalTransferred() {
+        return dollarTotalTransferred;
+    }
+
+    public void setDollarTotalTransferred(double dollarTotalTransferred) {
+        this.dollarTotalTransferred = dollarTotalTransferred;
+    }
+
+    public List<Results> getResultsInProgress() {
+        return resultsInProgress;
+    }
+
+    public void setResultsInProgress(List<Results> resultsInProgress) {
+        this.resultsInProgress = resultsInProgress;
+    }
+
+    public Balance getBalanceJSON() {
+        return balanceJSON;
+    }
+
+    public void setBalanceJSON(Balance balanceJSON) {
+        this.balanceJSON = balanceJSON;
+    }
+
+    public Dashboard getDashboard() {
+        return dashboard;
+    }
+
+    public void setDashboard(Dashboard dashboard) {
+        this.dashboard = dashboard;
     }
 }

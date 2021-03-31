@@ -61,6 +61,7 @@ public class FinSmartInvestor implements Callable<Investment> {
                     queueStr.wait();
                 } catch (InterruptedException e) {
                     System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
+                    queueStr.setActualSize(queueStr.getActualSize()-1);
                     break;
                 }
                 if(queueStr.getQueue().size() > 0){
