@@ -616,7 +616,7 @@ public class FinSmartUtil {
             parameters = generateJSONInvest(investment.getAmount(), investment.getCurrency(),investment.getOpportunity().getId());
             responseJSON = executeInvestment(parameters,loginJSON.getAccessToken());
             System.out.println("Invoice: "+investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" Buyer: "+
-                    investment.getOpportunity().getDebtor().getCompanyName()+" - "+getTime());
+                    investment.getOpportunity().getDebtor().getCompanyName()+" Amount:"+investment.getAmount()+" - "+getTime());
             if(responseJSON.isStatus()){
                 investment.setStatus("true");
                 investment.setCompleted(true);

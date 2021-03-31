@@ -92,7 +92,7 @@ public class HMVikingController {
             if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
                 Callable<Investment> callableInvestor = new FinSmartInvestor(queueStructure,investment,loginJSON,
                         investmentBlockInv.getScheduledTime(), reportService, userId, investmentBlockInv.getSystem(),
-                        investmentBlockInv.getTimeRequest());
+                        investmentBlockInv.getTimeRequest(),investmentBlockInv.isSleep());
                 Future<Investment> futureCounterResult = pool.submit(callableInvestor);
                 listOfThreads.add(futureCounterResult);
             }else if(investmentBlockInv.getSystem().equals("HMFACTUREDO")){

@@ -200,7 +200,7 @@ public class FinSmartCIG{
         } catch (MalformedURLException | ProtocolException e ) {
             e.printStackTrace();
         }  catch (SocketTimeoutException e) {
-            System.out.println("More than " + timeRequest + "milliseconds elapsed on request");
+            System.out.println("Opportunities finsmart: " + timeRequest + "milliseconds elapsed on request - "+getTime());
         }catch (Throwable e) {
             System.out.println(e);
         }

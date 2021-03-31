@@ -27,9 +27,10 @@ public class FinSmartInvestor implements Callable<Investment> {
     private User userId;
     private String systemId;
     private int timeRequest;
+    private boolean sleep;
 
     public FinSmartInvestor(QueueStructure queueStr, Investment investment, LoginJSON loginJSON, String scheduleTime,
-                            IReportService reportService, User userId, String systemId, int timeRequest){
+                            IReportService reportService, User userId, String systemId, int timeRequest,  boolean sleep){
         this.queueStr = queueStr;
         this.investment = investment;
         this.loginJSON = loginJSON;
@@ -38,6 +39,7 @@ public class FinSmartInvestor implements Callable<Investment> {
         this.userId = userId;
         this.systemId = systemId;
         this.timeRequest = timeRequest;
+        this.sleep = sleep;
     }
 
     @Override
@@ -57,8 +59,17 @@ public class FinSmartInvestor implements Callable<Investment> {
         System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
         while (!queueStr.isCancelled()) {
             synchronized (queueStr) {
-                try {
+                /*try {
                     queueStr.wait();
+                } catch (InterruptedException e) {
+                    System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
+                    queueStr.setActualSize(queueStr.getActualSize()-1);
+                    break;
+                }*/
+                try {
+                    if(!sleep){
+                        TimeUnit.MILLISECONDS.sleep(timeRequest);
+                    }else TimeUnit.MILLISECONDS.sleep(200);
                 } catch (InterruptedException e) {
                     System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
                     queueStr.setActualSize(queueStr.getActualSize()-1);
@@ -85,12 +96,6 @@ public class FinSmartInvestor implements Callable<Investment> {
                         }
                     }
                 }
-                /*try {
-                    TimeUnit.MILLISECONDS.sleep(timeRequest);
-                } catch (InterruptedException e) {
-                    System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
-                    break;
-                }*/
             }
             if(minutesElapsed(start, Instant.now()) >= 15){
                 System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+
