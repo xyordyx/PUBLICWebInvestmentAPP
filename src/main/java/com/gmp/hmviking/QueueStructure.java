@@ -20,7 +20,7 @@ public class QueueStructure {
         this.queueResults = new LinkedList<>();
         this.actualSize = actualSize;
         this.isCancelled = false;
-        this.balance = new HashMap<String,Double>();
+        this.balance = new HashMap<>();
         this.balance.put("pen",availableSoles);
         this.balance.put("usd",availableDollar);
     }

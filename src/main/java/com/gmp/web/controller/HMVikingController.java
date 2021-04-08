@@ -131,6 +131,7 @@ public class HMVikingController {
         pool.shutdownNow();
     }
 
+    @SuppressWarnings("unchecked")
     @RequestMapping(value="/getDataUX.json",method = RequestMethod.GET)
     public @ResponseBody
     InvestmentBlock manualSendDataUX(){
@@ -154,9 +155,7 @@ public class HMVikingController {
                     try {
                         investmentBlockInv.setInvestmentList(updateInvestment(future.get(),
                                 investmentBlockInv.getInvestmentList()));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
+                    } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }
                 }
@@ -170,6 +169,7 @@ public class HMVikingController {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Scheduled(fixedDelay = 15000)
     private void sendDataUX() {
         if(enabled.get()){
@@ -193,9 +193,7 @@ public class HMVikingController {
                     try {
                         investmentBlockInv.setInvestmentList(updateInvestment(future.get(),
                                 investmentBlockInv.getInvestmentList()));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
+                    } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }
                 }
@@ -359,11 +357,7 @@ public class HMVikingController {
     @RequestMapping(value="/smartTestConnection",method = RequestMethod.GET)
     public @ResponseBody boolean testConnection(@ModelAttribute("smartUser") SmartUserDto smartUserDto) {
         try {
-            if(FinSmartCIG.getAuthentications(smartUserDto) == null){
-                return false;
-            }else{
-                return true;
-            }
+            return FinSmartCIG.getAuthentications(smartUserDto) != null;
         } catch (IOException e) {
             return false;
         }
@@ -400,7 +394,7 @@ public class HMVikingController {
 
     @PostMapping(value = "/smartUserProfile")
     public String smartUserProfile(@ModelAttribute("smartUser") SmartUserDto smartUserDto, @AuthenticationPrincipal User user) {
-        LoginJSON auth = null;
+        LoginJSON auth;
         try {
             auth = FinSmartCIG.getAuthentications(smartUserDto);
         } catch (IOException e) {
@@ -428,7 +422,7 @@ public class HMVikingController {
 
     @PostMapping(value = "/factUserProfile")
     public String factUserProfile(@ModelAttribute("factUser") FactUserDto factUserDto, @AuthenticationPrincipal User user) {
-        LoginJSON auth = null;
+        LoginJSON auth;
         try {
             auth = FacturedoCIG.getAuthentications(factUserDto);
         } catch (IOException e) {
@@ -447,11 +441,7 @@ public class HMVikingController {
     @RequestMapping(value="/factuTestConnection",method = RequestMethod.GET)
     public @ResponseBody boolean testConnection(@ModelAttribute("factUser") FactUserDto factUserDto) {
         try {
-            if(FacturedoCIG.getAuthentications(factUserDto) == null){
-                return false;
-            }else{
-                return true;
-            }
+            return FacturedoCIG.getAuthentications(factUserDto) != null;
         } catch (IOException e) {
             return false;
         }
