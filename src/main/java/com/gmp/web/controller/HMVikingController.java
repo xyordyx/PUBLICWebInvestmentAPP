@@ -131,7 +131,6 @@ public class HMVikingController {
         pool.shutdownNow();
     }
 
-    @SuppressWarnings("unchecked")
     @RequestMapping(value="/getDataUX.json",method = RequestMethod.GET)
     public @ResponseBody
     InvestmentBlock manualSendDataUX(){
@@ -169,7 +168,6 @@ public class HMVikingController {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     @Scheduled(fixedDelay = 15000)
     private void sendDataUX() {
         if(enabled.get()){
