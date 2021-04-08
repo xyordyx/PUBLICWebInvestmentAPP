@@ -80,7 +80,7 @@ public class FinSmartInvestor implements Callable<Investment> {
                         investment = FinSmartUtil.waitForInvoiceInvest(queueStr.getQueue().element(), investment);
                         try {
                             if(investment.getOpportunity() != null) {
-                                investment = FinSmartUtil.generateAndSubmit(investment,loginJSON);
+                                investment = FinSmartUtil.generateAndSubmit(investment,loginJSON, queueStr.getBalance());
                                 if(investment.isCompleted()){
                                     System.out.println("Customer " + investment.getOpportunity().getDebtor().getCompanyName()+" Invoice: "+
                                             investment.getOpportunity().getPhysicalInvoices().get(0).getCode() + " - Status: " +
@@ -88,6 +88,7 @@ public class FinSmartInvestor implements Callable<Investment> {
                                             investment.getMessage()+" - "+getTime());
                                     queueStr.setActualSize(queueStr.getActualSize()-1);
                                     reportService.updateInvestmentStatus(investment,userId,systemId);
+                                    if(investment.getStatus().equals("false")){ updateBalance(); }
                                     return investment;
                                 }
                             }
@@ -107,6 +108,22 @@ public class FinSmartInvestor implements Callable<Investment> {
             }
         }
         return null;
+    }
+
+    public void updateBalance(){
+        if(this.investment.isAutoAdjusted()){
+            if(this.investment.getCurrency().equals("pen")){
+                this.queueStr.getBalance().put("pen",
+                        (this.queueStr.getBalance().get("pen"))-this.investment.getAdjustedAmount());
+            }else  this.queueStr.getBalance().put("usd",
+                    (this.queueStr.getBalance().get("usd"))-this.investment.getAdjustedAmount());
+        }else {
+            if(this.investment.getCurrency().equals("pen")){
+                this.queueStr.getBalance().put("pen",
+                        (this.queueStr.getBalance().get("pen"))-this.investment.getAmount());
+            }else  this.queueStr.getBalance().put("usd",
+                    (this.queueStr.getBalance().get("usd"))-this.investment.getAmount());
+        }
     }
 }
 

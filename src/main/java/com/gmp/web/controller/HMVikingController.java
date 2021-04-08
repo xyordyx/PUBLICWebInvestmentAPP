@@ -70,7 +70,8 @@ public class HMVikingController {
     public String waitForInvoice(HttpSession session,Device device)  {
         schedulerSession = session;
         pool = Executors.newFixedThreadPool(investmentBlockInv.getInvestmentList().size()+2);
-        QueueStructure queueStructure = new QueueStructure(investmentBlockInv.getInvestmentList().size());
+        QueueStructure queueStructure = new QueueStructure(investmentBlockInv.getInvestmentList().size(),
+                finsmartData.getSolesAmountAvailable(), finsmartData.getDollarAmountAvailable());
         if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
             FinSmartSeeker seeker = new FinSmartSeeker(queueStructure, loginJSON, investmentBlockInv.getScheduledTime(),
                     investmentBlockInv.getTimeRequest(),investmentBlockInv.isSleep());
@@ -84,7 +85,7 @@ public class HMVikingController {
             pool.execute(seeker);
             pool.execute(updaterFact);
         }
-        List<Future<Investment>> listOfThreads = new ArrayList<Future<Investment>>();
+        List<Future<Investment>> listOfThreads = new ArrayList<>();
         for(Investment investment : investmentBlockInv.getInvestmentList()) {
             if(investmentBlockInv.isScheduled()){
                 investment.setStatus("Scheduled");

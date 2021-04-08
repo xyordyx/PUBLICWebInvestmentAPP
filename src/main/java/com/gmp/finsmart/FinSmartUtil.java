@@ -14,6 +14,7 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class FinSmartUtil {
     private static String op2 = "[\n" +
             "  {\n" +
             "    \"status\": \"sale closed\", \n" +
-            "    \"availableBalanceAmount\": \"0.00\", \n" +
+            "    \"availableBalanceAmount\": \"2000.00\", \n" +
             "    \"debtor\": {\n" +
             "      \"_id\": \"5fdfb84046ff262a53c7fb4d\", \n" +
             "      \"companyName\": \"universidad catolica san pablo\", \n" +
@@ -57,39 +58,6 @@ public class FinSmartUtil {
             "    \"debtorContact\": \"602427701e736300090b4473\", \n" +
             "    \"createdAt\": \"2021-02-10T18:36:10.246Z\", \n" +
             "    \"reservationAmount\": \"2260.76\"\n" +
-            "  }, \n" +
-            "  {\n" +
-            "    \"status\": \"sale closed\", \n" +
-            "    \"availableBalanceAmount\": \"0.00\", \n" +
-            "    \"debtor\": {\n" +
-            "      \"_id\": \"5fdfb84046ff262a53c7fb0b\", \n" +
-            "      \"companyName\": \"petrex sa\", \n" +
-            "      \"companyRuc\": \"20103744211\"\n" +
-            "    }, \n" +
-            "    \"minimumDuration\": 24, \n" +
-            "    \"tem\": \"1.0742\", \n" +
-            "    \"advanceAmount\": \"14230.55\", \n" +
-            "    \"netAmount\": \"15811.72\", \n" +
-            "    \"isConfirming\": false, \n" +
-            "    \"toBeCollectedIn\": 24, \n" +
-            "    \"currency\": \"pen\", \n" +
-            "    \"physicalInvoices\": [\n" +
-            "      {\n" +
-            "        \"totalAmount\": \"17967.86\", \n" +
-            "        \"code\": \"E001-984\", \n" +
-            "        \"netAmount\": \"15811.72\", \n" +
-            "        \"retentionAmount\": \"2156.14\"\n" +
-            "      }\n" +
-            "    ], \n" +
-            "    \"paymentDate\": \"2021-03-11\", \n" +
-            "    \"updatedAt\": \"2021-02-15T17:27:02.972Z\", \n" +
-            "    \"tea\": \"13.68\", \n" +
-            "    \"availableBalancePercentage\": \"1000.00\", \n" +
-            "    \"_id\": \"6023101cd468b10008a652d6\", \n" +
-            "    \"publishAt\": \"2021-02-15T17:26:05.410Z\", \n" +
-            "    \"debtorContact\": \"5fffa4120d587116a0ad0f27\", \n" +
-            "    \"createdAt\": \"2021-02-09T22:43:40.187Z\", \n" +
-            "    \"reservationAmount\": \"1581.17\"\n" +
             "  }\n" +
             "]\n";
     private static String op3 = "[\n" +
@@ -128,7 +96,7 @@ public class FinSmartUtil {
             "  }, \n" +
             "  {\n" +
             "    \"status\": \"sale closed\", \n" +
-            "    \"availableBalanceAmount\": \"0.00\", \n" +
+            "    \"availableBalanceAmount\": \"2000.00\", \n" +
             "    \"debtor\": {\n" +
             "      \"_id\": \"5fdfb84046ff262a53c7fb0b\", \n" +
             "      \"companyName\": \"petrex sa\", \n" +
@@ -161,7 +129,7 @@ public class FinSmartUtil {
             "  }, \n" +
             "  {\n" +
             "    \"status\": \"sale closed\", \n" +
-            "    \"availableBalanceAmount\": \"0.00\", \n" +
+            "    \"availableBalanceAmount\": \"1000.00\", \n" +
             "    \"debtor\": {\n" +
             "      \"_id\": \"5fdfb84046ff262a53c7faca\", \n" +
             "      \"companyName\": \"soluciones en telecomunicaciones will s.a.c.\", \n" +
@@ -328,7 +296,7 @@ public class FinSmartUtil {
     private static String op4 = "[\n" +
             "  {\n" +
             "    \"status\": \"sale closed\", \n" +
-            "    \"availableBalanceAmount\": \"0.00\", \n" +
+            "    \"availableBalanceAmount\": \"10.00\", \n" +
             "    \"debtor\": {\n" +
             "      \"_id\": \"5fdfb84046ff262a53c7fb4d\", \n" +
             "      \"companyName\": \"universidad catolica san pablo\", \n" +
@@ -595,6 +563,7 @@ public class FinSmartUtil {
 
     private static final String amountBigger = "INVESTMENTS.INVESTMENT_AMOUNT_IS_BIGGER_THAN_TARGET_INVOICE_AVAILABLE_BALANCE";
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static DecimalFormat df2 = new DecimalFormat("#.#");
 
     public static List<String> parseString(String formField){
         return Arrays.stream(formField.split(","))
@@ -609,11 +578,13 @@ public class FinSmartUtil {
                 .collect(Collectors.toList());
     }
 
-    public static Investment generateAndSubmit(Investment investment, LoginJSON loginJSON) throws IOException {
+    public static Investment generateAndSubmit(Investment investment, LoginJSON loginJSON,
+                                               HashMap<String,Double> balance) throws IOException {
         String parameters;
         ResponseJSON responseJSON;
         if(investment.getOpportunity().getAvailableBalanceAmount() >= investment.getAmount()){
-            parameters = generateJSONInvest(investment.getAmount(), investment.getCurrency(),investment.getOpportunity().getId());
+            parameters = generateJSONInvest(investment.getAmount(), investment.getCurrency(),
+                    investment.getOpportunity().getId(),balance);
             responseJSON = executeInvestment(parameters,loginJSON.getAccessToken());
             System.out.println("Invoice: "+investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" Buyer: "+
                     investment.getOpportunity().getDebtor().getCompanyName()+" Amount:"+investment.getAmount()+" - "+getTime());
@@ -633,7 +604,7 @@ public class FinSmartUtil {
             //Feature: Auto investment to the current Invoice amount available
             if(investment.getOpportunity().getAvailableBalanceAmount() > 0){
                 parameters = generateJSONInvest(investment.getOpportunity().getAvailableBalanceAmount(),
-                        investment.getCurrency(),investment.getOpportunity().getId());
+                        investment.getCurrency(),investment.getOpportunity().getId(),balance);
                 responseJSON = executeInvestment(parameters,loginJSON.getAccessToken());
                 System.out.println("AUTO ADJUSTMENT Invoice: "+investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" Buyer: "+
                         investment.getOpportunity().getDebtor().getCompanyName()+
@@ -655,8 +626,12 @@ public class FinSmartUtil {
         return investment;
     }
 
-    public static String generateJSONInvest(double amount, String currency, String invoice_id){
-        return "{\"amount\":\""+amount+"\",\"currency\":\""+currency+"\",\"invoice\":\""+invoice_id+
+    public static String generateJSONInvest(double amount, String currency, String invoice_id,HashMap<String,Double> balance){
+        //FEATURE TO INVEST WITH AVAILABLE BALANCE
+        if(amount >= balance.get(currency)){
+            return "{\"amount\":\""+df2.format(balance.get(currency))+"\",\"currency\":\""+currency+"\",\"invoice\":\""+invoice_id+
+                    "\",\"type\":\"investment\"}";
+        }else return "{\"amount\":\""+amount+"\",\"currency\":\""+currency+"\",\"invoice\":\""+invoice_id+
                 "\",\"type\":\"investment\"}";
     }
 
@@ -700,7 +675,7 @@ public class FinSmartUtil {
     }
 
     public static Map<String, InvoiceTransactions> indexInvoices(List<InvoiceTransactions> invoices){
-        Map<String,InvoiceTransactions> invoicesIndex = new HashMap<String,InvoiceTransactions>();
+        Map<String,InvoiceTransactions> invoicesIndex = new HashMap<>();
         for(InvoiceTransactions inv : invoices){
             invoicesIndex.put(inv.get_id(),inv);
         }
