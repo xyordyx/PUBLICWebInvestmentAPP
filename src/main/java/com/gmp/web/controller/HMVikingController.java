@@ -63,6 +63,8 @@ public class HMVikingController {
     private Double currencyFactor = 3.60;
     private FinsmartData finsmartData;
     private User userId;
+    private Double balancePEN;
+    private Double balanceUSD;
 
     private List<InvoiceTransactions> invoices;
 
@@ -71,7 +73,7 @@ public class HMVikingController {
         schedulerSession = session;
         pool = Executors.newFixedThreadPool(investmentBlockInv.getInvestmentList().size()+2);
         QueueStructure queueStructure = new QueueStructure(investmentBlockInv.getInvestmentList().size(),
-                finsmartData.getSolesAmountAvailable(), finsmartData.getDollarAmountAvailable());
+                balancePEN, balanceUSD);
         if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
             FinSmartSeeker seeker = new FinSmartSeeker(queueStructure, loginJSON, investmentBlockInv.getScheduledTime(),
                     investmentBlockInv.getTimeRequest(),investmentBlockInv.isSleep());
@@ -231,8 +233,10 @@ public class HMVikingController {
         finsmartData = reportService.processFinancialTransactions(financialTransactions,invoices,userId);
         System.out.println("Financial transactions processed - OK - "+getTime());
 
-        model.addAttribute("balancePEN", finsmartData.getSolesAmountAvailable());
-        model.addAttribute("balanceUSD", finsmartData.getDollarAmountAvailable());
+        balancePEN = finsmartData.getSolesAmountAvailable();
+        balanceUSD = finsmartData.getDollarAmountAvailable();
+        model.addAttribute("balancePEN", balancePEN);
+        model.addAttribute("balanceUSD", balanceUSD);
         model.addAttribute("totalInvestedPEN", formatter.format(finsmartData.getSolesCurrentInvested()));
         model.addAttribute("totalInvestedUSD", formatter.format(finsmartData.getDollarCurrentInvested()));
         model.addAttribute("totalInvested", formatter.format(finsmartData.getSolesCurrentInvested() +
@@ -303,8 +307,10 @@ public class HMVikingController {
         System.out.println("Login successfully - OK - "+ getTime());
         FacturedoData factuData = new FacturedoData(loginJSON);
         model.addAttribute("investmentForm", new InvestmentForm());
-        model.addAttribute("balancePEN", factuData.getSolesAmountAvailable());
-        model.addAttribute("balanceUSD", factuData.getDollarAmountAvailable());
+        balancePEN = factuData.getSolesAmountAvailable();
+        balanceUSD = factuData.getDollarAmountAvailable();
+        model.addAttribute("balancePEN", balancePEN);
+        model.addAttribute("balanceUSD", balanceUSD);
         model.addAttribute("totalInvestedPEN", factuData.getSolesCurrentInvested());
         model.addAttribute("totalInvestedUSD", factuData.getDollarCurrentInvested());
         model.addAttribute("totalInvested", factuData.getSolesCurrentInvested() +

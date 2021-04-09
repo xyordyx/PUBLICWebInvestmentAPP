@@ -49,6 +49,7 @@ public class FacturedoInvestor implements Callable<Investment> {
                 TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime));
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " was awakened - " + getTime());
+                queueStr.setActualSize(queueStr.getActualSize()-1);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
