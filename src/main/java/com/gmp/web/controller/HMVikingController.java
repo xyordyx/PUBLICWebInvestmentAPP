@@ -321,10 +321,11 @@ public class HMVikingController {
         model.addAttribute("totalDeposits", formatter.format(factuData.getSolesTotalTransferred() +
                 (factuData.getDollarTotalTransferred()*currencyFactor)));
 
-        model.addAttribute("totalProfitPEN", factuData.getSolesTotalProfit());
-        model.addAttribute("totalProfitUSD", factuData.getDollarTotalProfit());
-        model.addAttribute("totalProfit", formatter.format(factuData.getSolesTotalProfit() +
-                (factuData.getDollarTotalProfit()*currencyFactor)));
+        model.addAttribute("totalProfitPEN", ((balancePEN+factuData.getSolesCurrentInvested()-factuData.getSolesTotalTransferred())));
+        model.addAttribute("totalProfitUSD", ((balanceUSD+factuData.getDollarCurrentInvested()-factuData.getDollarTotalTransferred())));
+        model.addAttribute("totalProfit", formatter.format(
+                (balancePEN+factuData.getSolesCurrentInvested()-factuData.getSolesTotalTransferred()) +
+                ((balanceUSD+factuData.getDollarCurrentInvested()-factuData.getDollarTotalTransferred()))*currencyFactor));
 
         model.addAttribute("expectedProfitPEN", factuData.getSolesProfitExpected());
         model.addAttribute("expectedProfitUSD", factuData.getDollarProfitExpected());
