@@ -354,6 +354,9 @@ public class HMVikingController {
             investmentBlockInv.setScheduled(true);
             return "redirect:/waitForInvoice";
         }
+        if(!investmentForm.getTimeRequest().equals("")){
+            investmentBlockInv.setTimeRequest((int)(Double.parseDouble(investmentForm.getTimeRequest())*1000));
+        }else investmentBlockInv.setTimeRequest(500);
         investmentBlockInv.setScheduled(false);
         session.setAttribute("finSmartCollection", investmentBlockInv);
         return "redirect:/waitForInvoice";
