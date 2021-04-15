@@ -45,6 +45,16 @@ public class FinSmartInvestor implements Callable<Investment> {
     @Override
     public Investment call() {
         start = Instant.now();
+        if(scheduleTime != null) {
+            System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " scheduled - " + getTime());
+            try {
+                Thread.sleep(timesDiff(scheduleTime));
+            } catch (InterruptedException e) {
+                System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " was awakened - " + getTime());
+            }
+            scheduleTime = null;
+        }
+        System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
         while (!queueStr.isCancelled()) {
             synchronized (queueStr) {
                 /*try {
@@ -55,12 +65,6 @@ public class FinSmartInvestor implements Callable<Investment> {
                     break;
                 }*/
                 try {
-                    if(scheduleTime != null) {
-                        System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " scheduled - " + getTime());
-                        Thread.sleep(timesDiff(scheduleTime));
-                        System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
-                        scheduleTime = null;
-                    }
                     if(queueStr.getQueue().size() > 0){
                         if(queueStr.getQueue().element().size() > 0){
                             investment = FinSmartUtil.waitForInvoiceInvest(queueStr.getQueue().element(), investment);
@@ -86,7 +90,7 @@ public class FinSmartInvestor implements Callable<Investment> {
                     if(!this.sleep){
                         Thread.sleep(this.timeRequest);
                     }else Thread.sleep(200);
-                } catch (InterruptedException | ParseException e) {
+                } catch (InterruptedException e) {
                     System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
                     queueStr.setActualSize(queueStr.getActualSize()-1);
                     break;

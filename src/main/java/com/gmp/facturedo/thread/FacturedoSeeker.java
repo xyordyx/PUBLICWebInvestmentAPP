@@ -41,14 +41,18 @@ public class FacturedoSeeker extends Thread {
         Auctions jsonList;
         List<Results> tempList;
         int temp = 0;
+        if(this.scheduleTime != null) {
+            System.out.println(Thread.currentThread().getName() + ":Seeker - scheduled - " + getTime());
+            try {
+                Thread.sleep(timesDiff(scheduleTime));
+            } catch (InterruptedException e) {
+                System.out.println(Thread.currentThread().getName() + ":Seeker - was awakened - " + getTime());
+            }
+            System.out.println(Thread.currentThread().getName() + ": Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
+            this.scheduleTime = null;
+        }
         while (queueStr.getActualSize()!=0 && !queueStr.isCancelled()) {
             try {
-                if(scheduleTime != null) {
-                    System.out.println(Thread.currentThread().getName() + ":Seeker - scheduled - " + getTime());
-                    Thread.sleep(timesDiff(scheduleTime));
-                    System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
-                    scheduleTime = null;
-                }
                 synchronized (queueStr) {
                     if (queueStr.getQueueResults().size() > 0) {
                         queueStr.getQueueResults().clear();
@@ -75,7 +79,7 @@ public class FacturedoSeeker extends Thread {
                 if(!this.sleep){
                     Thread.sleep(this.timeRequest);
                 }
-            } catch (InterruptedException | ParseException e) {
+            } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
                 break;
             }

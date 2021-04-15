@@ -31,11 +31,9 @@ public class FinSmartUpdater implements Runnable {
                 TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime));
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName() + ":UI Updater - was awakened - " + getTime());
-            } catch (ParseException e) {
-                e.printStackTrace();
             }
         }
-
+        System.out.println(Thread.currentThread().getName() + ":UI Updater -  Started - " + getTime());
         start = Instant.now();
         this.queueStr = seeker.getStatus();
         while (queueStr.getActualSize()!=0 && !queueStr.isCancelled()) {

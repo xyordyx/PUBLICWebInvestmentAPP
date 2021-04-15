@@ -44,17 +44,24 @@ public class InvestmentUtil {
         return response;
     }
 
-    public static long timesDiff(String time2) throws ParseException {
+    public static long timesDiff(String time2){
         SimpleDateFormat format1 = new SimpleDateFormat("HH:mm:ss");
         SimpleDateFormat format2 = new SimpleDateFormat("HH:mm");
-        Date date1 = format1.parse(getNowTime());
-        Date date2 = format2.parse(time2);
-        if(date2.before(date1)){
-            Calendar c = Calendar.getInstance();
-            c.setTime(date2);
-            c.add(Calendar.DATE, 1);
-            date2 = c.getTime();
+        Date date1 = null;
+        Date date2 = null;
+        try {
+            date1 = format1.parse(getNowTime());
+            date2 = format2.parse(time2);
+            if(date2.before(date1)){
+                Calendar c = Calendar.getInstance();
+                c.setTime(date2);
+                c.add(Calendar.DATE, 1);
+                date2 = c.getTime();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
+
         return date2.getTime() - date1.getTime();
     }
 

@@ -46,16 +46,13 @@ public class FacturedoInvestor implements Callable<Investment> {
     @Override
     public Investment call() {
         if(scheduleTime != null) {
+            System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " scheduled - " + getTime());
             try {
-                System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " scheduled - " + getTime());
-                TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime));
-                System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
+                Thread.sleep(timesDiff(scheduleTime));
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " was awakened - " + getTime());
-                queueStr.setActualSize(queueStr.getActualSize()-1);
-            } catch (ParseException e) {
-                e.printStackTrace();
             }
+            scheduleTime = null;
         }
         start = Instant.now();
         System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
@@ -69,12 +66,6 @@ public class FacturedoInvestor implements Callable<Investment> {
                     break;
                 }*/
                 try {
-                    if(scheduleTime != null) {
-                        System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " scheduled - " + getTime());
-                        Thread.sleep(timesDiff(scheduleTime));
-                        System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
-                        scheduleTime = null;
-                    }
                     if(queueStr.getQueueResults().size() > 0){
                         if(queueStr.getQueueResults().element().size() > 0){
                             investment = waitForInvoiceInvest(queueStr.getQueueResults().element(), investment);
@@ -99,7 +90,7 @@ public class FacturedoInvestor implements Callable<Investment> {
                     if(!sleep){
                         Thread.sleep(timeRequest);
                     }else Thread.sleep(200);
-                } catch (InterruptedException | ParseException e) {
+                } catch (InterruptedException e) {
                     System.out.println(Thread.currentThread().getName()+": FactuInvestor stopped - " + getTime());
                     queueStr.setActualSize(queueStr.getActualSize()-1);
                     break;
