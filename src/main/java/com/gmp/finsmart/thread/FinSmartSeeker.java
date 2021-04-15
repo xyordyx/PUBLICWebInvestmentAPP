@@ -35,56 +35,48 @@ public class FinSmartSeeker extends Thread {
 
     @Override
     public void run() {
-        if(scheduleTime != null) {
-            try {
-                System.out.println(Thread.currentThread().getName() + ":Seeker - scheduled - " + getTime());
-                TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime));
-                System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
-            } catch (InterruptedException e) {
-                System.out.println(Thread.currentThread().getName() + "Seeker - was awakened - " + getTime());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
         start = Instant.now();
         List<Opportunities> jsonList;
         int temp = 0;
-        System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
-        while (queueStr.getActualSize()!=0 && !queueStr.isCancelled()) {
-            synchronized (queueStr) {
-                if (queueStr.getQueue().size() > 0) {
-                    queueStr.getQueue().clear();
+        while (queueStr.getActualSize()!=0) {
+            try {
+                if(scheduleTime != null) {
+                    System.out.println(Thread.currentThread().getName() + ":Seeker - scheduled - " + getTime());
+                    Thread.sleep(timesDiff(scheduleTime));
+                    System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
+                    scheduleTime = null;
                 }
-                jsonList = getOpportunitiesJSON(loginJSON.getAccessToken(),timeRequest);
-                //jsonList = FinSmartUtil.getOpportunities(i);
-                if(jsonList != null) {
-                    if (jsonList.size() > 0) {
-                        queueStr.getQueue().add(jsonList);
-                        queueStr.notifyAll();
-                        System.out.println(Thread.currentThread().getName()+": Seeker - Added opportunities to queue - " + getTime());
+                synchronized (queueStr) {
+                    if (queueStr.getQueue().size() > 0) {
+                        queueStr.getQueue().clear();
+                    }
+                    jsonList = getOpportunitiesJSON(loginJSON.getAccessToken());
+                    //jsonList = FinSmartUtil.getOpportunities(i);
+                    if(jsonList != null) {
+                        if (jsonList.size() > 0) {
+                            queueStr.getQueue().add(jsonList);
+                            queueStr.notifyAll();
+                            System.out.println(Thread.currentThread().getName()+": Seeker - Added opportunities to queue - " + getTime());
                         /*if(temp != jsonList.size()){
                             temp = jsonList.size();
                             System.out.println(Thread.currentThread().getName()+": Seeker - Added opportunities to queue - " + getTime());
                         }*/
+                        }
                     }
+                    i++;
                 }
-                i++;
+                if(!this.sleep){
+                    Thread.sleep(this.timeRequest);
+                }
+            } catch (InterruptedException | ParseException e) {
+                System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
+                break;
             }
             if (minutesElapsed(start, Instant.now()) >= 15) {
                 System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped after 15 minutes - " + getTime());
                 break;
             }
-            try {
-                if(!sleep){
-                    TimeUnit.MILLISECONDS.sleep(timeRequest);
-                }
-                //System.out.println(Thread.currentThread().getName()+ getTime());
-            } catch (InterruptedException e) {
-                System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
-                break;
-            }
         }
-        System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
     }
 
     public QueueStructure getStatus(){

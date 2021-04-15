@@ -1,22 +1,37 @@
 package com.gmp.facturedo;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmp.facturedo.JSON.*;
 import com.gmp.hmviking.LoginJSON;
+import com.gmp.hmviking.ResponseJSON;
 import com.gmp.persistence.model.FactUser;
 import com.gmp.web.dto.FactUserDto;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import okhttp3.*;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 
+import javax.net.ssl.SSLException;
 import java.io.*;
 import java.net.*;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import static com.gmp.hmviking.InvestmentUtil.getTime;
 import static com.gmp.hmviking.InvestmentUtil.readResponse;
 
 
@@ -36,75 +51,116 @@ public class FacturedoCIG {
 
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public static JsonObject executeInvestment(JSONObject urlParameters, String token) throws IOException {
-        HttpURLConnection connection;
-        //Create connection
-        URL url = new URL(factBidURL);
-        connection = (HttpURLConnection)url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-        connection.setRequestProperty("Accept", "application/json, text/plain, */*");
-        connection.setRequestProperty("Content-length", "" + urlParameters.size());
-        connection.setRequestProperty("Authorization", "JWT "+token);
+    public static ResponseJSON executeInvestment(String urlParameters, String token) {
+        CloseableHttpClient client = HttpClients.createDefault();
+        CloseableHttpResponse response = null;
+        String stringResponse = null;
+        ResponseJSON responseJSON = null;
+        HttpPost httpPost = new HttpPost(factBidURL);
+        try {
+            StringEntity entity = new StringEntity(urlParameters);
+            httpPost.setEntity(entity);
+            httpPost.setHeader("Content-Type", "application/json");
+            httpPost.setHeader("Accept-Encoding", "gzip, deflate, br");
+            httpPost.setHeader("Accept", "application/json, text/plain, */*");
+            //httpPost.setHeader("Content-Length", String.valueOf(entity.getContentLength()));
+            httpPost.setHeader("Authorization", "JWT "+token);
 
-        connection.setUseCaches (false);
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-
-        try(OutputStream os = connection.getOutputStream()) {
-            byte[] input = urlParameters.toJSONString().getBytes("utf-8");
-            os.write(input, 0, input.length);
+            response = client.execute(httpPost);
+            ObjectMapper objectMapper = new ObjectMapper();
+            if(response.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_CREATED) {
+                String json = "{\"status\":true}";
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                responseJSON = objectMapper.readValue(json,ResponseJSON.class);
+            }else{
+                stringResponse = EntityUtils.toString(response.getEntity());
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                String json = "{\"status\":false,\"message\":\""+objectMapper
+                        .readValue(stringResponse,ResponseJSON.class).getNon_field_errors().get(0)+"\"}";
+                responseJSON = objectMapper.readValue(json,ResponseJSON.class);
+                System.out.println("FINSMART ERROR RESPONSE: "+responseJSON.getMessage() + " - "+getTime());
+            }
+            client.close();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        //Send request
-        DataOutputStream wr = new DataOutputStream (
-                connection.getOutputStream ());
-        wr.writeBytes (urlParameters.toJSONString());
-        wr.flush ();
-        wr.close ();
-
-        JsonObject responseJSON;
-        int responseCode = connection.getResponseCode();
-        StringBuilder resp = readResponse(connection);
-        if (responseCode == HttpURLConnection.HTTP_CREATED) { //success
-            responseJSON = gson.fromJson("{\"status\":true,\"message\":\"\"}",
-                    JsonElement.class).getAsJsonObject();
-        } else if(responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR){
-            responseJSON = gson.fromJson("{status:false,message:WRONG INVOICE ID/INTERNAL ERROR}",
-                    JsonElement.class).getAsJsonObject();
-        }
-        else {
-            responseJSON = gson.fromJson("{status:false,message:"+resp+"}",
-                    JsonElement.class).getAsJsonObject();
-        }
-        System.out.print("Response from Facturedo: "+responseJSON.toString());
         return responseJSON;
     }
 
-    public static Auctions getOpportunitiesJSON(LoginJSON loginJSON, int timeRequest) {
+
+    public static Auctions opp(LoginJSON loginJSON) {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String stringResponse = null;
+        HttpGet httpGet = new HttpGet(factOpportunities);
+        try {
+            httpGet.addHeader("Content-Type", "application/json");
+            httpGet.addHeader("Accept-Encoding", "gzip, deflate, br");
+            httpGet.addHeader("Accept", "application/json, text/plain, */*");
+            //httpPost.setHeader("Content-Length", String.valueOf(entity.getContentLength()));
+            httpGet.addHeader("Authorization", "JWT "+loginJSON.getToken());
+
+            RequestConfig requestConfig = RequestConfig.custom()
+                    .setConnectionRequestTimeout(250)
+                    .setConnectTimeout(250)
+                    .setSocketTimeout(250)
+                    .build();
+            httpGet.setConfig(requestConfig);
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    httpGet.abort();
+                }
+            };
+            new Timer(true).schedule(task, 600);
+            CloseableHttpResponse response = httpClient.execute(httpGet);
+            stringResponse = EntityUtils.toString(response.getEntity());
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            return objectMapper.readValue(stringResponse,Auctions.class);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (SocketTimeoutException e) {
+            System.out.println("Opportunities facturedo: 250 milliseconds elapsed on request - "+getTime());
+        }catch (SSLException e) {
+            System.out.println("Socket closed - "+getTime());
+        }catch (InterruptedIOException e) {
+            System.out.println("Connection has been shut down - "+getTime());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Auctions getOpportunitiesJSON(LoginJSON loginJSON) {
         URL url;
         try {
             url = new URL(factOpportunities);
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod("GET");
-            con.setConnectTimeout(timeRequest);
-            con.setReadTimeout(timeRequest);
+            con.setConnectTimeout(250);
+            con.setReadTimeout(250);
             con.setRequestProperty("Content-Type", "application/json");
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Authorization", "JWT "+loginJSON.getToken());
-            return gson.fromJson(readResponse(con).toString(), Auctions.class);
+            Auctions auctions= gson.fromJson(readResponse(con).toString(), Auctions.class);
+            return auctions;
         } catch (MalformedURLException | ProtocolException e ) {
             e.printStackTrace();
         }  catch (SocketTimeoutException e) {
-            System.out.println("More than " + timeRequest + "milliseconds elapsed on request");
+            System.out.println("Opportunities facturedo: 250 milliseconds elapsed on request - "+getTime());
         }catch (Throwable e) {
             System.out.println(e);
         }
         return null;
     }
 
-    public static Auctions getOpportunitiesJSON(LoginJSON loginJSON) {
+    public static Auctions getOpportunitiesJSONTIME(LoginJSON loginJSON) {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(120, TimeUnit.SECONDS)

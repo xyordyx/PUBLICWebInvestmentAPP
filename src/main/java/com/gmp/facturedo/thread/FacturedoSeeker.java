@@ -1,5 +1,7 @@
 package com.gmp.facturedo.thread;
 
+import com.gmp.facturedo.FacturedoUtil;
+import com.gmp.facturedo.JSON.Auctions;
 import com.gmp.facturedo.JSON.Results;
 import com.gmp.hmviking.LoginJSON;
 import com.gmp.hmviking.QueueStructure;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.gmp.facturedo.FacturedoCIG.getOpportunitiesJSON;
+import static com.gmp.facturedo.FacturedoCIG.opp;
 import static com.gmp.hmviking.InvestmentUtil.*;
 
 
@@ -34,53 +37,51 @@ public class FacturedoSeeker extends Thread {
 
     @Override
     public void run() {
-        if(scheduleTime != null) {
-            try {
-                System.out.println(Thread.currentThread().getName() + "FactuSeeker - scheduled - " + getTime());
-                TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime));
-                System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
-            } catch (InterruptedException e) {
-                System.out.println(Thread.currentThread().getName() + "FactuSeeker - was awakened - " + getTime());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
         start = Instant.now();
-        List<Results> jsonList;
+        Auctions jsonList;
+        List<Results> tempList;
         int temp = 0;
-        System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
         while (queueStr.getActualSize()!=0 && !queueStr.isCancelled()) {
-            synchronized (queueStr) {
-                if (queueStr.getQueueResults().size() > 0) {
-                    queueStr.getQueueResults().clear();
+            try {
+                if(scheduleTime != null) {
+                    System.out.println(Thread.currentThread().getName() + ":Seeker - scheduled - " + getTime());
+                    Thread.sleep(timesDiff(scheduleTime));
+                    System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
+                    scheduleTime = null;
                 }
-                jsonList = getOpportunitiesJSON(loginJSON,timeRequest).getResults();
-                //jsonList = FacturedoUtil.getOpportunities(i).getResults();
-                if(jsonList != null) {
-                    if (jsonList.size() > 0) {
-                        queueStr.getQueueResults().add(jsonList);
-                        System.out.println(Thread.currentThread().getName()+": FactuSeeker - Added opportunities to queue - " + getTime());
-                        queueStr.notifyAll();
+                synchronized (queueStr) {
+                    if (queueStr.getQueueResults().size() > 0) {
+                        queueStr.getQueueResults().clear();
+                    }
+                    jsonList = opp(loginJSON);
+                    //jsonList = getOpportunitiesJSON(loginJSON);
+                    //jsonList = FacturedoUtil.getOpportunities(i);
+                    if(jsonList != null) {
+                        if (jsonList.getResults() != null) {
+                            tempList = jsonList.getResults();
+                            if (tempList.size() > 0) {
+                                queueStr.getQueueResults().add(tempList);
+                                System.out.println(Thread.currentThread().getName() + ": FactuSeeker - Added opportunities to queue - " + getTime());
+                                queueStr.notifyAll();
                          /*if(temp != jsonList.size()){
                             temp = jsonList.size();
                             System.out.println(Thread.currentThread().getName()+": Seeker - Added opportunities to queue - " + getTime());
                         }*/
+                            }
+                        }
                     }
+                    i++;
                 }
-                i++;
+                if(!this.sleep){
+                    Thread.sleep(this.timeRequest);
+                }
+            } catch (InterruptedException | ParseException e) {
+                System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
+                break;
             }
             if (minutesElapsed(start, Instant.now()) >= 15) {
                 System.out.println(Thread.currentThread().getName()+": FactuSeeker - OP seeker stopped after 15 minutes - " + getTime());
                 break;
-            }
-            if(!sleep){
-                try {
-                    TimeUnit.MILLISECONDS.sleep(timeRequest);
-                    //System.out.println(Thread.currentThread().getName()+ getTime());
-                } catch (InterruptedException e) {
-                    System.out.println(Thread.currentThread().getName()+": FactuSeeker - OP seeker stopped - " + getTime());
-                    break;
-                }
             }
         }
     }

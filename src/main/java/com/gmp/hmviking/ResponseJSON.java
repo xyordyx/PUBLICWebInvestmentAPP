@@ -5,12 +5,15 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Transient;
+import java.util.List;
 
 public class ResponseJSON {
     @Transient
     private boolean status;
     @Transient
     private String message;
+    @Transient
+    private List<String> non_field_errors = null;
 
     @JsonCreator
     public ResponseJSON(@JsonProperty("status") boolean status,@JsonProperty("message") String message) {
@@ -34,5 +37,14 @@ public class ResponseJSON {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public List<String> getNon_field_errors() {
+        return non_field_errors;
+    }
+
+    @JsonProperty("non_field_errors")
+    public void setNon_field_errors(List<String> non_field_errors) {
+        this.non_field_errors = non_field_errors;
     }
 }

@@ -184,14 +184,14 @@ public class FinSmartCIG{
         return null;
     }
 
-    public static List<Opportunities> getOpportunitiesJSON(String token, int timeRequest) {
+    public static List<Opportunities> getOpportunitiesJSON(String token) {
         URL url;
         try {
             url = new URL(smartURLv1+opportunitiesPath);
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod("GET");
-            con.setConnectTimeout(timeRequest);
-            con.setReadTimeout(timeRequest);
+            con.setConnectTimeout(250);
+            con.setReadTimeout(250);
             con.setRequestProperty("Content-Type", "application/json");
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Authorization", "Bearer "+token);
@@ -200,7 +200,7 @@ public class FinSmartCIG{
         } catch (MalformedURLException | ProtocolException e ) {
             e.printStackTrace();
         }  catch (SocketTimeoutException e) {
-            System.out.println("Opportunities finsmart: " + timeRequest + "milliseconds elapsed on request - "+getTime());
+            System.out.println("Opportunities finsmart: 250 milliseconds elapsed on request - "+getTime());
         }catch (Throwable e) {
             System.out.println(e);
         }

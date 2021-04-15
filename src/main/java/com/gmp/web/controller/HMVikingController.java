@@ -101,7 +101,7 @@ public class HMVikingController {
             }else if(investmentBlockInv.getSystem().equals("HMFACTUREDO")){
                 Callable<Investment> callableInvestor = new FacturedoInvestor(queueStructure,investment,loginJSON,
                         investmentBlockInv.getScheduledTime(), reportService, userId, investmentBlockInv.getSystem(),
-                        investmentBlockInv.getTimeRequest());
+                        investmentBlockInv.getTimeRequest(),investmentBlockInv.isSleep());
                 Future<Investment> futureCounterResult = pool.submit(callableInvestor);
                 listOfThreads.add(futureCounterResult);
             }
@@ -121,15 +121,6 @@ public class HMVikingController {
 
     @RequestMapping(value="/cancelTransactions.json",method = RequestMethod.GET)
     public @ResponseBody void cancelTransactions(){
-        if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
-            if(!investmentBlockInv.isScheduled()){
-                updaterFin.getQueueStr().setCancelled(true);
-            }
-        }else{
-            if(!investmentBlockInv.isScheduled()){
-                updaterFact.getQueueStr().setCancelled(true);
-            }
-        }
         pool.shutdownNow();
     }
 
@@ -271,16 +262,14 @@ public class HMVikingController {
             return "redirect:/finsmart";
         }
         investmentBlockInv.setInvestmentList(temp);
-        if(!investmentForm.getScheduledTime().replace(",","").equals("none")){
-            investmentBlockInv.setScheduledTime(investmentForm.getScheduledTime().replace(",",""));
-            investmentBlockInv.setScheduled(true);
-            return "redirect:/waitForInvoice";
-        }
+        investmentBlockInv.setSleep(investmentForm.isSleep());
         if(!investmentForm.getTimeRequest().equals("")){
             investmentBlockInv.setTimeRequest((int)(Double.parseDouble(investmentForm.getTimeRequest())*1000));
         }else investmentBlockInv.setTimeRequest(500);
-        investmentBlockInv.setScheduled(false);
-        investmentBlockInv.setSleep(investmentForm.isSleep());
+        if(!investmentForm.getScheduledTime().replace(",","").equals("none")){
+            investmentBlockInv.setScheduledTime(investmentForm.getScheduledTime().replace(",",""));
+            investmentBlockInv.setScheduled(true);
+        }else investmentBlockInv.setScheduled(false);
         session.setAttribute("finSmartCollection", investmentBlockInv);
         return "redirect:/waitForInvoice";
     }
@@ -349,15 +338,14 @@ public class HMVikingController {
             return "redirect:/facturedo";
         }
         investmentBlockInv.setInvestmentList(temp);
-        if(!investmentForm.getScheduledTime().replace(",","").equals("none")){
-            investmentBlockInv.setScheduledTime(investmentForm.getScheduledTime().replace(",",""));
-            investmentBlockInv.setScheduled(true);
-            return "redirect:/waitForInvoice";
-        }
+        investmentBlockInv.setSleep(investmentForm.isSleep());
         if(!investmentForm.getTimeRequest().equals("")){
             investmentBlockInv.setTimeRequest((int)(Double.parseDouble(investmentForm.getTimeRequest())*1000));
         }else investmentBlockInv.setTimeRequest(500);
-        investmentBlockInv.setScheduled(false);
+        if(!investmentForm.getScheduledTime().replace(",","").equals("none")){
+            investmentBlockInv.setScheduledTime(investmentForm.getScheduledTime().replace(",",""));
+            investmentBlockInv.setScheduled(true);
+        }else investmentBlockInv.setScheduled(false);
         session.setAttribute("finSmartCollection", investmentBlockInv);
         return "redirect:/waitForInvoice";
     }
