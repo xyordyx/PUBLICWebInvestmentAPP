@@ -54,8 +54,8 @@ public class FacturedoInvestor implements Callable<Investment> {
             }
             scheduleTime = null;
         }
-        start = Instant.now();
         System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
+        start = Instant.now();
         while (!queueStr.isCancelled()) {
             synchronized (queueStr) {
                 /*try {

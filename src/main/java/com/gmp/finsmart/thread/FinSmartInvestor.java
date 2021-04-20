@@ -44,7 +44,6 @@ public class FinSmartInvestor implements Callable<Investment> {
 
     @Override
     public Investment call() {
-        start = Instant.now();
         if(scheduleTime != null) {
             System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " scheduled - " + getTime());
             try {
@@ -55,6 +54,7 @@ public class FinSmartInvestor implements Callable<Investment> {
             scheduleTime = null;
         }
         System.out.println(Thread.currentThread().getName()+": "+investment.getInvoiceNumber()+ " STARTED - " + getTime());
+        start = Instant.now();
         while (!queueStr.isCancelled()) {
             synchronized (queueStr) {
                 /*try {

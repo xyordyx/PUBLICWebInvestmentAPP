@@ -35,7 +35,6 @@ public class FinSmartSeeker extends Thread {
 
     @Override
     public void run() {
-        start = Instant.now();
         List<Opportunities> jsonList;
         int temp = 0;
         if(this.scheduleTime != null) {
@@ -48,6 +47,7 @@ public class FinSmartSeeker extends Thread {
             }
         }
         System.out.println(Thread.currentThread().getName() + ":Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
+        start = Instant.now();
         while (queueStr.getActualSize()!=0) {
             try {
 

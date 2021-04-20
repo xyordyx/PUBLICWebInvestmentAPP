@@ -37,7 +37,6 @@ public class FacturedoSeeker extends Thread {
 
     @Override
     public void run() {
-        start = Instant.now();
         Auctions jsonList;
         List<Results> tempList;
         int temp = 0;
@@ -48,9 +47,10 @@ public class FacturedoSeeker extends Thread {
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName() + ":Seeker - was awakened - " + getTime());
             }
-            System.out.println(Thread.currentThread().getName() + ": Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
             this.scheduleTime = null;
         }
+        System.out.println(Thread.currentThread().getName() + ": Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
+        start = Instant.now();
         while (queueStr.getActualSize()!=0 && !queueStr.isCancelled()) {
             try {
                 synchronized (queueStr) {
