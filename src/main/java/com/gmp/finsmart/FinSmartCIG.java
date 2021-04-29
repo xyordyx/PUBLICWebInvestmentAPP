@@ -221,7 +221,7 @@ public class FinSmartCIG{
 
         if(response.getStatusLine().getStatusCode() == 201) {
             stringResponse = EntityUtils.toString(response.getEntity());
-        }
+        }else stringResponse = "false";
         client.close();
 
         return new ObjectMapper()
