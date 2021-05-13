@@ -622,6 +622,7 @@ public class FinSmartUtil {
             }else{
                 investment.setStatus("false");
                 investment.setMessage("AMOUNT AVAILABLE IS 0.00");
+                investment.setCompleted(false);
             }
         }
         return investment;
