@@ -613,15 +613,16 @@ public class FinSmartUtil {
                     investment.setAutoAdjusted(true);
                     investment.setAdjustedAmount(investment.getOpportunity().getAvailableBalanceAmount());
                     investment.setStatus("true");
+                    investment.setCompleted(true);
                 }else{
                     investment.setStatus("false");
                     investment.setMessage(responseJSON.getMessage());
+                    investment.setCompleted(false);
                 }
             }else{
                 investment.setStatus("false");
                 investment.setMessage("AMOUNT AVAILABLE IS 0.00");
             }
-            investment.setCompleted(true);
         }
         return investment;
     }
