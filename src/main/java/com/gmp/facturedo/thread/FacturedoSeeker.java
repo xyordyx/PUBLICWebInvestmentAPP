@@ -22,17 +22,14 @@ public class FacturedoSeeker extends Thread {
     private LoginJSON loginJSON;
     private String scheduleTime;
     private int timeRequest;
-    private boolean sleep;
 
     private int i=0;
 
-    public FacturedoSeeker(QueueStructure queueStr, LoginJSON loginJSON, String scheduleTime, int timeRequest,
-                           boolean sleep){
+    public FacturedoSeeker(QueueStructure queueStr, LoginJSON loginJSON, String scheduleTime, int timeRequest){
         this.queueStr = queueStr;
         this.loginJSON = loginJSON;
         this.scheduleTime = scheduleTime;
         this.timeRequest = timeRequest;
-        this.sleep = sleep;
     }
 
     @Override
@@ -65,6 +62,7 @@ public class FacturedoSeeker extends Thread {
                             tempList = jsonList.getResults();
                             if (tempList.size() > 0) {
                                 queueStr.getQueueResults().add(tempList);
+                                queueStr.setUpdateDate(getTime());
                                 System.out.println(Thread.currentThread().getName() + ": FactuSeeker - Added opportunities to queue - " + getTime());
                                 queueStr.notifyAll();
                          /*if(temp != jsonList.size()){
@@ -76,9 +74,7 @@ public class FacturedoSeeker extends Thread {
                     }
                     i++;
                 }
-                if(!this.sleep){
-                    Thread.sleep(this.timeRequest);
-                }
+                Thread.sleep(this.timeRequest);
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
                 break;

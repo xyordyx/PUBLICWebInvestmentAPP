@@ -74,7 +74,8 @@ public class FinSmartCIG{
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 responseJSON = objectMapper.readValue(json,ResponseJSON.class);
-                System.out.println("FINSMART ERROR RESPONSE: "+responseJSON.getMessage() + " - "+getTime());
+                System.out.println(Thread.currentThread().getName()+"FINSMART ERROR RESPONSE: "
+                        +responseJSON.getMessage() + " - "+getTime());
             }
             client.close();
         } catch (UnsupportedEncodingException e) {

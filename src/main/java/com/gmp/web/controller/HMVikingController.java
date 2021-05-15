@@ -76,13 +76,13 @@ public class HMVikingController {
                 balancePEN, balanceUSD);
         if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
             FinSmartSeeker seeker = new FinSmartSeeker(queueStructure, loginJSON, investmentBlockInv.getScheduledTime(),
-                    investmentBlockInv.getTimeRequest(),investmentBlockInv.isSleep());
+                    investmentBlockInv.getTimeRequest());
             updaterFin = new FinSmartUpdater(seeker, investmentBlockInv.getScheduledTime());
             pool.execute(seeker);
             pool.execute(updaterFin);
         }else if(investmentBlockInv.getSystem().equals("HMFACTUREDO")){
             FacturedoSeeker seeker = new FacturedoSeeker(queueStructure,loginJSON, investmentBlockInv.getScheduledTime(),
-                    investmentBlockInv.getTimeRequest(),investmentBlockInv.isSleep());
+                    investmentBlockInv.getTimeRequest());
             updaterFact = new FacturedoUpdater(seeker, investmentBlockInv.getScheduledTime());
             pool.execute(seeker);
             pool.execute(updaterFact);
@@ -95,13 +95,13 @@ public class HMVikingController {
             if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
                 Callable<Investment> callableInvestor = new FinSmartInvestor(queueStructure,investment,loginJSON,
                         investmentBlockInv.getScheduledTime(), reportService, userId, investmentBlockInv.getSystem(),
-                        investmentBlockInv.getTimeRequest(),investmentBlockInv.isSleep());
+                        investmentBlockInv.getTimeRequest());
                 Future<Investment> futureCounterResult = pool.submit(callableInvestor);
                 listOfThreads.add(futureCounterResult);
             }else if(investmentBlockInv.getSystem().equals("HMFACTUREDO")){
                 Callable<Investment> callableInvestor = new FacturedoInvestor(queueStructure,investment,loginJSON,
                         investmentBlockInv.getScheduledTime(), reportService, userId, investmentBlockInv.getSystem(),
-                        investmentBlockInv.getTimeRequest(),investmentBlockInv.isSleep());
+                        investmentBlockInv.getTimeRequest());
                 Future<Investment> futureCounterResult = pool.submit(callableInvestor);
                 listOfThreads.add(futureCounterResult);
             }
@@ -262,7 +262,6 @@ public class HMVikingController {
             return "redirect:/finsmart";
         }
         investmentBlockInv.setInvestmentList(temp);
-        investmentBlockInv.setSleep(investmentForm.isSleep());
         if(!investmentForm.getTimeRequest().equals("")){
             investmentBlockInv.setTimeRequest((int)(Double.parseDouble(investmentForm.getTimeRequest())*1000));
         }else investmentBlockInv.setTimeRequest(500);
@@ -338,7 +337,6 @@ public class HMVikingController {
             return "redirect:/facturedo";
         }
         investmentBlockInv.setInvestmentList(temp);
-        investmentBlockInv.setSleep(investmentForm.isSleep());
         if(!investmentForm.getTimeRequest().equals("")){
             investmentBlockInv.setTimeRequest((int)(Double.parseDouble(investmentForm.getTimeRequest())*1000));
         }else investmentBlockInv.setTimeRequest(500);

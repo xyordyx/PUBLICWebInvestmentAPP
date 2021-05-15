@@ -27,10 +27,9 @@ public class FinSmartInvestor implements Callable<Investment> {
     private User userId;
     private String systemId;
     private int timeRequest;
-    private boolean sleep;
 
     public FinSmartInvestor(QueueStructure queueStr, Investment investment, LoginJSON loginJSON, String scheduleTime,
-                            IReportService reportService, User userId, String systemId, int timeRequest,  boolean sleep){
+                            IReportService reportService, User userId, String systemId, int timeRequest){
         this.queueStr = queueStr;
         this.investment = investment;
         this.loginJSON = loginJSON;
@@ -39,7 +38,6 @@ public class FinSmartInvestor implements Callable<Investment> {
         this.userId = userId;
         this.systemId = systemId;
         this.timeRequest = timeRequest;
-        this.sleep = sleep;
     }
 
     @Override
@@ -57,43 +55,31 @@ public class FinSmartInvestor implements Callable<Investment> {
         start = Instant.now();
         while (!queueStr.isCancelled()) {
             synchronized (queueStr) {
-                /*try {
-                    queueStr.wait();
-                } catch (InterruptedException e) {
-                    System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
-                    queueStr.setActualSize(queueStr.getActualSize()-1);
-                    break;
-                }*/
-                try {
-                    if(queueStr.getQueue().size() > 0){
-                        if(queueStr.getQueue().element().size() > 0){
-                            investment = FinSmartUtil.waitForInvoiceInvest(queueStr.getQueue().element(), investment);
-                            try {
-                                if(investment.getOpportunity() != null) {
-                                    investment = FinSmartUtil.generateAndSubmit(investment,loginJSON, queueStr.getBalance());
-                                    if(investment.isCompleted()){
-                                        System.out.println("Customer " + investment.getOpportunity().getDebtor().getCompanyName()+" Invoice: "+
-                                                investment.getOpportunity().getPhysicalInvoices().get(0).getCode() + " - Status: " +
-                                                investment.getStatus() +" - Message: "+
-                                                investment.getMessage()+" - "+getTime());
-                                        queueStr.setActualSize(queueStr.getActualSize()-1);
-                                        reportService.updateInvestmentStatus(investment,userId,systemId);
-                                        if(investment.getStatus().equals("false")){ updateBalance(); }
-                                        return investment;
-                                    }
+                if(queueStr.getQueue().size() > 0){
+                    if(queueStr.getQueue().element().size() > 0){
+                        investment = FinSmartUtil.waitForInvoiceInvest(queueStr.getQueue().element(), investment);
+                        try {
+                            if(investment.getOpportunity() != null) {
+                                investment = FinSmartUtil.generateAndSubmit(investment,loginJSON, queueStr.getBalance());
+                                if(investment.isCompleted()){
+                                    System.out.println(Thread.currentThread().getName()+"Customer " +
+                                            investment.getOpportunity().getDebtor().getCompanyName()+" Invoice: "+
+                                            investment.getOpportunity().getPhysicalInvoices().get(0).getCode() + " - Status: " +
+                                            investment.getStatus() +" - Message: "+
+                                            investment.getMessage()+" - "+getTime());
+                                    queueStr.setActualSize(queueStr.getActualSize()-1);
+                                    reportService.updateInvestmentStatus(investment,userId,systemId);
+                                    if(investment.getStatus().equals("false")){ updateBalance(); }
+                                    return investment;
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
                             }
+                            Thread.sleep(this.timeRequest);
+                        } catch (IOException | InterruptedException e) {
+                            System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
+                            queueStr.setActualSize(queueStr.getActualSize()-1);
+                            break;
                         }
                     }
-                    if(!this.sleep){
-                        Thread.sleep(this.timeRequest);
-                    }else Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    System.out.println(Thread.currentThread().getName()+": Investor stopped - " + getTime());
-                    queueStr.setActualSize(queueStr.getActualSize()-1);
-                    break;
                 }
             }
             if(minutesElapsed(start, Instant.now()) >= 15){

@@ -586,7 +586,7 @@ public class FinSmartUtil {
             parameters = generateJSONInvest(investment.getAmount(), investment.getCurrency(),
                     investment.getOpportunity().getId(),balance);
             responseJSON = executeInvestment(parameters,loginJSON.getAccessToken());
-            System.out.println("Invoice: "+investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" Buyer: "+
+            System.out.println(Thread.currentThread().getName()+"Invoice: "+investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" Buyer: "+
                     investment.getOpportunity().getDebtor().getCompanyName()+" Amount:"+investment.getAmount()+" - "+getTime());
             if(responseJSON.isStatus()){
                 investment.setStatus("true");
@@ -606,7 +606,7 @@ public class FinSmartUtil {
                 parameters = generateJSONInvest(investment.getOpportunity().getAvailableBalanceAmount(),
                         investment.getCurrency(),investment.getOpportunity().getId(),balance);
                 responseJSON = executeInvestment(parameters,loginJSON.getAccessToken());
-                System.out.println("AUTO ADJUSTMENT Invoice: "+investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" Buyer: "+
+                System.out.println(Thread.currentThread().getName()+"AUTO ADJUSTMENT Invoice: "+investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" Buyer: "+
                         investment.getOpportunity().getDebtor().getCompanyName()+
                         " Amount: "+investment.getOpportunity().getAvailableBalanceAmount()+" "+getTime());
                 if(responseJSON.isStatus()){
@@ -622,7 +622,7 @@ public class FinSmartUtil {
             }else{
                 investment.setStatus("false");
                 investment.setMessage("AMOUNT AVAILABLE IS 0.00");
-                investment.setCompleted(false);
+                investment.setCompleted(true);
             }
         }
         return investment;

@@ -3,10 +3,7 @@ package com.gmp.hmviking;
 import com.gmp.facturedo.JSON.Results;
 import com.gmp.finsmart.JSON.Opportunities;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class QueueStructure {
     private Queue<List<Opportunities>> queue;
@@ -14,6 +11,7 @@ public class QueueStructure {
     private int actualSize;
     private boolean isCancelled;
     private HashMap<String,Double> balance;
+    private String updateDate;
 
     public QueueStructure(int actualSize, double availableSoles, double availableDollar) {
         this.queue = new LinkedList<>();
@@ -23,6 +21,14 @@ public class QueueStructure {
         this.balance = new HashMap<>();
         this.balance.put("pen",availableSoles);
         this.balance.put("usd",availableDollar);
+    }
+
+    public String getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
     }
 
     public HashMap<String, Double> getBalance() {

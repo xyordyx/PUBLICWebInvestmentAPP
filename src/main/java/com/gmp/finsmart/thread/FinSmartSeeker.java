@@ -20,17 +20,14 @@ public class FinSmartSeeker extends Thread {
     private LoginJSON loginJSON;
     private String scheduleTime;
     private int timeRequest;
-    private boolean sleep;
 
     private int i=0;
 
-    public FinSmartSeeker(QueueStructure queueStr, LoginJSON loginJSON, String scheduleTime, int timeRequest,
-                          boolean sleep){
+    public FinSmartSeeker(QueueStructure queueStr, LoginJSON loginJSON, String scheduleTime, int timeRequest){
         this.queueStr = queueStr;
         this.loginJSON = loginJSON;
         this.scheduleTime = scheduleTime;
         this.timeRequest = timeRequest;
-        this.sleep = sleep;
     }
 
     @Override
@@ -50,7 +47,6 @@ public class FinSmartSeeker extends Thread {
         start = Instant.now();
         while (queueStr.getActualSize()!=0) {
             try {
-
                 synchronized (queueStr) {
                     if (queueStr.getQueue().size() > 0) {
                         queueStr.getQueue().clear();
@@ -60,6 +56,7 @@ public class FinSmartSeeker extends Thread {
                     if(jsonList != null) {
                         if (jsonList.size() > 0) {
                             queueStr.getQueue().add(jsonList);
+                            queueStr.setUpdateDate(getTime());
                             queueStr.notifyAll();
                             System.out.println(Thread.currentThread().getName()+": Seeker - Added opportunities to queue - " + getTime());
                         /*if(temp != jsonList.size()){
@@ -70,9 +67,7 @@ public class FinSmartSeeker extends Thread {
                     }
                     i++;
                 }
-                if(!this.sleep){
-                    Thread.sleep(this.timeRequest);
-                }
+                Thread.sleep(this.timeRequest);
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
                 break;
