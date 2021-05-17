@@ -51,7 +51,7 @@ public class FinSmartSeeker extends Thread {
                     if (queueStr.getQueue().size() > 0) {
                         queueStr.getQueue().clear();
                     }
-                    jsonList = getOpportunitiesJSON(loginJSON.getAccessToken());
+                    jsonList = getOpportunitiesJSON2(loginJSON.getAccessToken());
                     //jsonList = FinSmartUtil.getOpportunities(i);
                     if(jsonList != null) {
                         if (jsonList.size() > 0) {

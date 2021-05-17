@@ -137,7 +137,7 @@ public class FinSmartCIG{
         return invoiceTransactions;
     }
 
-    public static List<Opportunities> getOpportunitiesJSON1(String token,int timeRequest) {
+    public static List<Opportunities> getOpportunitiesJSON3(String token) {
         DefaultHttpClient httpClient = new DefaultHttpClient();
         String stringResponse;
         List<Opportunities> opportunities = new ArrayList<>();
@@ -164,11 +164,11 @@ public class FinSmartCIG{
         return opportunities;
     }
 
-    public static List<Opportunities> getOpportunities2(String token, int timeRequest){
+    public static List<Opportunities> getOpportunitiesJSON2(String token){
         OkHttpClient client = new OkHttpClient().newBuilder()
-                .connectTimeout(timeRequest, TimeUnit.MILLISECONDS)
-                .readTimeout(timeRequest, TimeUnit.MILLISECONDS)
-                //.writeTimeout(timeRequest, TimeUnit.MILLISECONDS)
+                .connectTimeout(500, TimeUnit.MILLISECONDS)
+                .readTimeout(500, TimeUnit.MILLISECONDS)
+                //.writeTimeout(250, TimeUnit.MILLISECONDS)
                 .build();
         Request request = new Request.Builder()
                 .url(smartURLv1+opportunitiesPath)
@@ -192,7 +192,7 @@ public class FinSmartCIG{
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod("GET");
             con.setConnectTimeout(250);
-            con.setReadTimeout(250);
+            //con.setReadTimeout(250);
             con.setRequestProperty("Content-Type", "application/json");
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("Authorization", "Bearer "+token);
