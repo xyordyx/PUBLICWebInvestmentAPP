@@ -1,6 +1,7 @@
 package com.gmp.hmviking;
 
 import com.gmp.finsmart.FinSmartUtil;
+import com.gmp.finsmart.JSON.PhysicalInvoices;
 import com.gmp.web.dto.Investment;
 import com.gmp.web.dto.InvestmentForm;
 
@@ -23,7 +24,7 @@ import java.util.concurrent.Future;
 
 public class InvestmentUtil {
     public static String getTime(){
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss SSS MM/dd");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss SSS ");
         ZoneId zone = ZoneId.of("America/Lima");
         LocalDateTime now = LocalDateTime.now(zone).plus(329, ChronoUnit.MILLIS);
         return dtf.format(now);
@@ -45,6 +46,9 @@ public class InvestmentUtil {
     }
 
     public static long timesDiff(String time2){
+        if(time2 == null){
+            return 0;
+        }
         SimpleDateFormat format1 = new SimpleDateFormat("HH:mm:ss");
         SimpleDateFormat format2 = new SimpleDateFormat("HH:mm");
         Date date1 = null;
@@ -82,9 +86,12 @@ public class InvestmentUtil {
         List<String> currencyList = FinSmartUtil.parseString(investmentForm.getCurrency());
         List<String> invoiceList = FinSmartUtil.parseString(investmentForm.getInvoiceNumber());
         if(currencyList.size()-1 == amountList.size() && amountList.size() == invoiceList.size()) {
-            List<Investment> listInv = new ArrayList<Investment>();
+            List<Investment> listInv = new ArrayList<>();
             for (int i = 0; i < invoiceList.size(); i++) {
                 Investment inv = new Investment();
+                PhysicalInvoices code = new PhysicalInvoices();
+                code.setCode(invoiceList.get(i));
+                inv.setFormCode(code);
                 inv.setInvoiceNumber(invoiceList.get(i));
                 inv.setAmount(amountList.get(i));
                 inv.setCurrency(currencyList.get(i));
@@ -110,26 +117,12 @@ public class InvestmentUtil {
         return investmentList;
     }
 
-    public static List<Investment> updateInvestment(Investment future, List<Investment> investmentList){
+    public static List<Investment> updateInvestment(List<Investment> investmentList){
         for(int i=0; i<investmentList.size(); i++){
-            if(investmentList.get(i).getInvoiceNumber() == future.getInvoiceNumber()){
-                investmentList.get(i).setStatus(future.getStatus());
-                investmentList.get(i).setMessage(future.getMessage());
-                investmentList.get(i).setOpportunity(future.getOpportunity());
                 if(investmentList.get(i).getUIState() == null){
                     investmentList.get(i).setUIState("true");
                 }else investmentList.get(i).setUIState("false");
-            }
         }
         return investmentList;
-    }
-
-    public static boolean isDone(List<Future<Investment>> listOfThreads ){
-        for(Future inv : listOfThreads){
-            if(!inv.isDone()){
-                return false;
-            }
-        }
-        return true;
     }
 }

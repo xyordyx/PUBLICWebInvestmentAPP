@@ -9,7 +9,6 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -63,7 +62,7 @@ public class FinSmartUtil {
     private static String op3 = "[\n" +
             "  {\n" +
             "    \"status\": \"sale closed\", \n" +
-            "    \"availableBalanceAmount\": \"0.00\", \n" +
+            "    \"availableBalanceAmount\": \"1000.00\", \n" +
             "    \"debtor\": {\n" +
             "      \"_id\": \"5fdfb84046ff262a53c7fb4d\", \n" +
             "      \"companyName\": \"universidad catolica san pablo\", \n" +
@@ -296,7 +295,7 @@ public class FinSmartUtil {
     private static String op4 = "[\n" +
             "  {\n" +
             "    \"status\": \"sale closed\", \n" +
-            "    \"availableBalanceAmount\": \"10.00\", \n" +
+            "    \"availableBalanceAmount\": \"0.00\", \n" +
             "    \"debtor\": {\n" +
             "      \"_id\": \"5fdfb84046ff262a53c7fb4d\", \n" +
             "      \"companyName\": \"universidad catolica san pablo\", \n" +
@@ -546,6 +545,12 @@ public class FinSmartUtil {
             "        \"code\": \"E001-301\", \n" +
             "        \"netAmount\": \"113275.00\", \n" +
             "        \"retentionAmount\": \"1725.00\"\n" +
+            "      }\n," +
+            "      {\n" +
+            "        \"totalAmount\": \"115000.00\", \n" +
+            "        \"code\": \"E001-123\", \n" +
+            "        \"netAmount\": \"113275.00\", \n" +
+            "        \"retentionAmount\": \"1725.00\"\n" +
             "      }\n" +
             "    ], \n" +
             "    \"paymentDate\": \"2021-06-14\", \n" +
@@ -578,53 +583,63 @@ public class FinSmartUtil {
                 .collect(Collectors.toList());
     }
 
-    public static Investment generateAndSubmit(Investment investment, LoginJSON loginJSON,
-                                               HashMap<String,Double> balance) throws IOException {
+    public static ResponseJSON postToFinSmart(double amount, Investment investment, HashMap<String,Double> balance,
+                                              LoginJSON json){
         String parameters;
         ResponseJSON responseJSON;
+        parameters = generateJSONInvest(amount, investment.getCurrency(), investment.getOpportunity().getId(),balance);
+        responseJSON = executeInvestment(parameters,json.getAccessToken());
+        return responseJSON;
+    }
+
+    public static Investment generateAndSubmit(Investment investment, LoginJSON loginJSON,
+                                               HashMap<String,Double> balance) {
+        ResponseJSON responseJSON;
+        double amountSubmit = 0;
         if(investment.getOpportunity().getAvailableBalanceAmount() >= investment.getAmount()){
-            parameters = generateJSONInvest(investment.getAmount(), investment.getCurrency(),
-                    investment.getOpportunity().getId(),balance);
-            responseJSON = executeInvestment(parameters,loginJSON.getAccessToken());
-            System.out.println(Thread.currentThread().getName()+"Invoice: "+investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" Buyer: "+
-                    investment.getOpportunity().getDebtor().getCompanyName()+" Amount:"+investment.getAmount()+" - "+getTime());
+            responseJSON = postToFinSmart(investment.getAmount(),investment,balance,loginJSON);
             if(responseJSON.isStatus()){
+                amountSubmit = investment.getAmount();
                 investment.setStatus("true");
-                investment.setCompleted(true);
             }else{
                 if(responseJSON.getMessage().replace('"',' ').equals(amountBigger)){
-                    investment.setCompleted(false);
+                    //FEATURE:IF AMOUNT IS BIGGER INVEST 30% LESS
+                    double adjustment = (investment.getAmount()-(investment.getAmount()*0.30));
+                    if(adjustment > 100){
+                        responseJSON = postToFinSmart(adjustment,investment,balance,loginJSON);
+                    }
+                    if(responseJSON.isStatus()){
+                        amountSubmit = adjustment;
+                        investment.setStatus("true");
+                    }
                 }else {
                     investment.setStatus("false");
                     investment.setMessage(responseJSON.getMessage());
-                    investment.setCompleted(true);
                 }
             }
         }else {
             //Feature: Auto investment to the current Invoice amount available
             if(investment.getOpportunity().getAvailableBalanceAmount() > 0){
-                parameters = generateJSONInvest(investment.getOpportunity().getAvailableBalanceAmount(),
-                        investment.getCurrency(),investment.getOpportunity().getId(),balance);
-                responseJSON = executeInvestment(parameters,loginJSON.getAccessToken());
-                System.out.println(Thread.currentThread().getName()+"AUTO ADJUSTMENT Invoice: "+investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" Buyer: "+
-                        investment.getOpportunity().getDebtor().getCompanyName()+
-                        " Amount: "+investment.getOpportunity().getAvailableBalanceAmount()+" "+getTime());
+                responseJSON = postToFinSmart(investment.getOpportunity().getAvailableBalanceAmount(),investment,
+                        balance,loginJSON);
                 if(responseJSON.isStatus()){
+                    amountSubmit = investment.getOpportunity().getAvailableBalanceAmount();
                     investment.setAutoAdjusted(true);
                     investment.setAdjustedAmount(investment.getOpportunity().getAvailableBalanceAmount());
                     investment.setStatus("true");
-                    investment.setCompleted(true);
-                }else{
-                    investment.setStatus("false");
-                    investment.setMessage(responseJSON.getMessage());
-                    investment.setCompleted(false);
+                    investment.setMessage("");
                 }
             }else{
                 investment.setStatus("false");
                 investment.setMessage("AMOUNT AVAILABLE IS 0.00");
-                investment.setCompleted(true);
             }
         }
+        investment.setCompleted(true);
+        System.out.println(Thread.currentThread().getName()+"Invest:"+getTime()+
+                investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" "+
+                investment.getOpportunity().getDebtor().getCompanyName()+" STATUS: "+
+                investment.getStatus()+" Amount:"+amountSubmit+ " MSG:"+investment.getMessage());
+
         return investment;
     }
 
@@ -637,34 +652,55 @@ public class FinSmartUtil {
                 "\",\"type\":\"investment\"}";
     }
 
-    public static Investment waitForInvoiceInvest(List<Opportunities> opportunities, Investment formInvestment){
-        if(!opportunities.isEmpty()){
-            formInvestment=getOpportunityMatch(opportunities,formInvestment);
+    public static Investment waitForInvoiceInvest(HashMap<String,Opportunities> oppMap, Investment formInvestment){
+        for (Map.Entry<String, Opportunities> it : oppMap.entrySet()) {
+            if(!formInvestment.getSkipList().contains(it.getKey())) {
+                if(it.getValue().getPhysicalInvoices().contains(formInvestment.getFormCode()) &&
+                        it.getValue().getCurrency().equals(formInvestment.getCurrency())){
+                    formInvestment.setOpportunity(it.getValue());
+                    return formInvestment;
+                }else formInvestment.getSkipList().add(it.getKey());
+            }
         }
         return formInvestment;
     }
 
-    public static Investment getOpportunityMatch(List<Opportunities> opportunities, Investment inv){
-        for(Opportunities OP : opportunities){
-            for(PhysicalInvoices physicalInvoices : OP.getPhysicalInvoices()){
-                if(physicalInvoices.getCode().equals(inv.getInvoiceNumber()) && OP.getCurrency().equals(inv.getCurrency())){
-                    inv.setOpportunity(OP);
+    public static Investment waitForInvoiceInvest(List<Opportunities> opportunities, Investment formInvestment){
+        for(Opportunities op : opportunities){
+            if(op.getPhysicalInvoices().contains(formInvestment.getFormCode()) &&
+                    op.getCurrency().equals(formInvestment.getCurrency())){
+                formInvestment.setOpportunity(op);
+                return formInvestment;
+            }
+        }
+        return formInvestment;
+    }
+
+    public static Investment waitForInvoiceInvest(String threadName, List<Opportunities> opportunities,
+                                                  List<Investment> invList){
+        String concat = "";
+        for(Opportunities op : opportunities){
+            concat = concat+op.getPhysicalInvoices().get(0).getCode()+"("+op.getAvailableBalanceAmount()+")"+" ";
+            for(Investment inv : invList){
+                if(op.getPhysicalInvoices().contains(inv.getFormCode()) && op.getCurrency().equals(inv.getCurrency())){
+                    inv.setOpportunity(op);
                     return inv;
                 }
             }
         }
-        return inv;
+        System.out.println(threadName+"Seeker:"+ getTime()+concat);
+        return null;
     }
 
     public static List<Opportunities> getOpportunities(int i){
         Type founderListType = new TypeToken<ArrayList<Opportunities>>(){}.getType();
-        if(i>=20 && i <=30){
+        if(i>=5 && i <=10){
             return gson.fromJson(op2, founderListType);
         }
-        else if (i>30 && i <=50){
+        else if (i>10 && i <=15){
             return gson.fromJson(op3, founderListType);
         }
-        else if (i>50 && i <=80){
+        else if (i>60 && i <=80){
             return gson.fromJson(op4, founderListType);
         }
         else return gson.fromJson(op, founderListType);
@@ -688,5 +724,11 @@ public class FinSmartUtil {
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 
-
+    public static HashMap<String,Opportunities> processOpportunities
+            (List<Opportunities> jsonList, HashMap<String,Opportunities> oppMap){
+        for(Opportunities op : jsonList){
+            oppMap.put(op.getId(),op);
+        }
+        return oppMap;
+    }
 }

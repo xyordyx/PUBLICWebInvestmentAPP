@@ -2,12 +2,10 @@ package com.gmp.web.controller;
 
 import com.gmp.facturedo.FacturedoCIG;
 import com.gmp.facturedo.JSON.*;
-import com.gmp.facturedo.thread.FacturedoInvestor;
 import com.gmp.facturedo.thread.FacturedoSeeker;
 import com.gmp.facturedo.thread.FacturedoUpdater;
 import com.gmp.finsmart.JSON.*;
 import com.gmp.hmviking.InvestmentBlock;
-import com.gmp.finsmart.thread.FinSmartInvestor;
 import com.gmp.finsmart.thread.*;
 import com.gmp.hmviking.LoginJSON;
 import com.gmp.hmviking.QueueStructure;
@@ -39,13 +37,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.gmp.finsmart.FinSmartCIG.*;
 import static com.gmp.hmviking.InvestmentUtil.*;
+import static com.gmp.hmviking.InvestmentUtil.updateInvestment;
 
 @Controller
 public class HMVikingController {
     private LoginJSON loginJSON;
     private InvestmentBlock investmentBlockInv;
     private ExecutorService pool;
-    private FinSmartUpdater updaterFin;
     private FacturedoUpdater updaterFact;
     @Autowired
     private FactUserRepository factUserRepository;
@@ -65,48 +63,32 @@ public class HMVikingController {
     private User userId;
     private Double balancePEN;
     private Double balanceUSD;
-
     private List<InvoiceTransactions> invoices;
+
+    private HashMap<Integer,Results> auctMap;
+    private int actualSize;
+    private volatile QueueStructure queueStructure;
 
     @GetMapping({"/waitForInvoice"})
     public String waitForInvoice(HttpSession session,Device device)  {
+        auctMap = new HashMap<>();
         schedulerSession = session;
-        pool = Executors.newFixedThreadPool(investmentBlockInv.getInvestmentList().size()+2);
-        QueueStructure queueStructure = new QueueStructure(investmentBlockInv.getInvestmentList().size(),
-                balancePEN, balanceUSD);
+        actualSize = investmentBlockInv.getInvestmentList().size();
+        pool = Executors.newFixedThreadPool(actualSize);
+        queueStructure = new QueueStructure(investmentBlockInv.getInvestmentList().size(),
+                balancePEN, balanceUSD,investmentBlockInv.getSystem());
         if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
-            FinSmartSeeker seeker = new FinSmartSeeker(queueStructure, loginJSON, investmentBlockInv.getScheduledTime(),
-                    investmentBlockInv.getTimeRequest());
-            updaterFin = new FinSmartUpdater(seeker, investmentBlockInv.getScheduledTime());
+            FinSmartSeekerThread seeker = new FinSmartSeekerThread(loginJSON,investmentBlockInv.getScheduledTime(),
+                    investmentBlockInv.getTimeRequest(),queueStructure,investmentBlockInv.getInvestmentList(),
+                    reportService,userId,investmentBlockInv.getSystem());
             pool.execute(seeker);
-            pool.execute(updaterFin);
         }else if(investmentBlockInv.getSystem().equals("HMFACTUREDO")){
             FacturedoSeeker seeker = new FacturedoSeeker(queueStructure,loginJSON, investmentBlockInv.getScheduledTime(),
-                    investmentBlockInv.getTimeRequest());
+                    investmentBlockInv.getTimeRequest(),auctMap);
             updaterFact = new FacturedoUpdater(seeker, investmentBlockInv.getScheduledTime());
             pool.execute(seeker);
             pool.execute(updaterFact);
         }
-        List<Future<Investment>> listOfThreads = new ArrayList<>();
-        for(Investment investment : investmentBlockInv.getInvestmentList()) {
-            if(investmentBlockInv.isScheduled()){
-                investment.setStatus("Scheduled");
-            } else investment.setStatus("inProgress");
-            if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
-                Callable<Investment> callableInvestor = new FinSmartInvestor(queueStructure,investment,loginJSON,
-                        investmentBlockInv.getScheduledTime(), reportService, userId, investmentBlockInv.getSystem(),
-                        investmentBlockInv.getTimeRequest());
-                Future<Investment> futureCounterResult = pool.submit(callableInvestor);
-                listOfThreads.add(futureCounterResult);
-            }else if(investmentBlockInv.getSystem().equals("HMFACTUREDO")){
-                Callable<Investment> callableInvestor = new FacturedoInvestor(queueStructure,investment,loginJSON,
-                        investmentBlockInv.getScheduledTime(), reportService, userId, investmentBlockInv.getSystem(),
-                        investmentBlockInv.getTimeRequest());
-                Future<Investment> futureCounterResult = pool.submit(callableInvestor);
-                listOfThreads.add(futureCounterResult);
-            }
-        }
-        session.setAttribute("threadList", listOfThreads);
         session.setAttribute("investmentsList", investmentBlockInv.getInvestmentList());
         enabled.set(true);
         if(device.isMobile()){
@@ -121,52 +103,29 @@ public class HMVikingController {
 
     @RequestMapping(value="/cancelTransactions.json",method = RequestMethod.GET)
     public @ResponseBody void cancelTransactions(){
-        pool.shutdownNow();
+        this.pool.shutdownNow();
+        this.pool.shutdown();
     }
 
     @RequestMapping(value="/getDataUX.json",method = RequestMethod.GET)
     public @ResponseBody
-    InvestmentBlock manualSendDataUX(){
+    QueueStructure manualSendDataUX(){
         if(enabled.get()){
-            List<Future<Investment>> listOfInvestments = (List<Future<Investment>>) schedulerSession.getAttribute("threadList");
-            if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
-                if(updaterFin.getQueueStr()!=null && !flag && investmentBlockInv.isScheduled()){
-                    investmentBlockInv.setInvestmentList(setInProgress(investmentBlockInv.getInvestmentList()));
-                    flag = true;
-                    return investmentBlockInv;
-                }
-            }else{
-                if(updaterFact.getQueueStr()!=null && !flag && investmentBlockInv.isScheduled()){
-                    investmentBlockInv.setInvestmentList(setInProgress(investmentBlockInv.getInvestmentList()));
-                    flag = true;
-                    return investmentBlockInv;
-                }
+            updateInvestment(queueStructure.getInvestmentList());
+            if(actualSize == queueStructure.getInvestmentList().size()){
+                queueStructure.setTransactionStatus(true);
+                enabled.set(false);
             }
-            for (Future<Investment> future : listOfInvestments){
-                if(future.isDone()){
-                    try {
-                        investmentBlockInv.setInvestmentList(updateInvestment(future.get(),
-                                investmentBlockInv.getInvestmentList()));
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if(isDone(listOfInvestments)){
-                    investmentBlockInv.setTransactionStatus(true);
-                    enabled.set(false);
-                }
-            }
-            return investmentBlockInv;
+            return queueStructure;
         }
         return null;
     }
 
-    @Scheduled(fixedDelay = 15000)
+    @Scheduled(fixedDelay = 10000)
     private void sendDataUX() {
         if(enabled.get()){
-            List<Future<Investment>> listOfInvestments = (List<Future<Investment>>) schedulerSession.getAttribute("threadList");
             if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
-                if(updaterFin.getQueueStr()!=null && !flag && investmentBlockInv.isScheduled()){
+                if(!flag && investmentBlockInv.isScheduled()){
                     investmentBlockInv.setInvestmentList(setInProgress(investmentBlockInv.getInvestmentList()));
                     flag = true;
                     simpMessagingTemplate.convertAndSend("/finSmart/investments", investmentBlockInv);
@@ -179,21 +138,12 @@ public class HMVikingController {
                     simpMessagingTemplate.convertAndSend("/finSmart/investments", investmentBlockInv);
                 }
             }
-            for (Future<Investment> future : listOfInvestments){
-                if(future.isDone()){
-                    try {
-                        investmentBlockInv.setInvestmentList(updateInvestment(future.get(),
-                                investmentBlockInv.getInvestmentList()));
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if(isDone(listOfInvestments)){
-                    investmentBlockInv.setTransactionStatus(true);
-                    enabled.set(false);
-                }
+            updateInvestment(queueStructure.getInvestmentList());
+            if(actualSize == queueStructure.getInvestmentList().size()){
+                queueStructure.setTransactionStatus(true);
+                enabled.set(false);
             }
-            simpMessagingTemplate.convertAndSend("/finSmart/investments", investmentBlockInv);
+            simpMessagingTemplate.convertAndSend("/finSmart/investments", queueStructure);
         }
     }
 

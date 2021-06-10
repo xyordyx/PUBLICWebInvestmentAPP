@@ -17,6 +17,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -27,12 +28,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 
+import javax.net.ssl.SSLException;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.gmp.hmviking.InvestmentUtil.getTime;
@@ -51,8 +51,8 @@ public class FinSmartCIG{
 
     public static ResponseJSON executeInvestment(String urlParameters, String token) {
         CloseableHttpClient client = HttpClients.createDefault();
-        CloseableHttpResponse response = null;
-        String stringResponse = null;
+        CloseableHttpResponse response;
+        String stringResponse;
         ResponseJSON responseJSON = null;
         HttpPost httpPost = new HttpPost(smartURLv1+financialTransactionsPath);
         try {
@@ -74,8 +74,8 @@ public class FinSmartCIG{
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 responseJSON = objectMapper.readValue(json,ResponseJSON.class);
-                System.out.println(Thread.currentThread().getName()+"FINSMART ERROR RESPONSE: "
-                        +responseJSON.getMessage() + " - "+getTime());
+                System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+"ERROR RESPONSE: "
+                        +responseJSON.getMessage()+" Payload:"+urlParameters);
             }
             client.close();
         } catch (UnsupportedEncodingException e) {
@@ -137,6 +137,44 @@ public class FinSmartCIG{
         return invoiceTransactions;
     }
 
+    public static List<Opportunities> getOpportunitiesJSON4(String token) {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        String stringResponse;
+        List<Opportunities> opportunities = new ArrayList<>();
+        HttpGet httpGet = new HttpGet(smartURLv1+opportunitiesPath);
+        try {
+            httpGet.addHeader("Accept", "application/json");
+            httpGet.addHeader("Content-Type", "application/json");
+            httpGet.addHeader("Authorization", "Bearer "+token);
+
+            RequestConfig requestConfig = RequestConfig.custom()
+                    .setConnectionRequestTimeout(500)
+                    .setConnectTimeout(500)
+                    .setSocketTimeout(500)
+                    .build();
+            httpGet.setConfig(requestConfig);
+            CloseableHttpResponse response = httpClient.execute(httpGet);
+            stringResponse = EntityUtils.toString(response.getEntity());
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            Opportunities[] op = objectMapper.readValue(stringResponse, Opportunities[].class);
+            opportunities = new ArrayList<>(Arrays.asList(op));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (SocketTimeoutException e) {
+            System.out.println("Opportunities facturedo: 250 milliseconds elapsed on request - "+getTime());
+        }catch (SSLException e) {
+            System.out.println("Socket closed - "+getTime());
+        }catch (InterruptedIOException e) {
+            System.out.println("Connection has been shut down - "+getTime());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return opportunities;
+    }
+
     public static List<Opportunities> getOpportunitiesJSON3(String token) {
         DefaultHttpClient httpClient = new DefaultHttpClient();
         String stringResponse;
@@ -165,6 +203,7 @@ public class FinSmartCIG{
     }
 
     public static List<Opportunities> getOpportunitiesJSON2(String token){
+        System.setProperty("http.keepAlive", "false");
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .connectTimeout(500, TimeUnit.MILLISECONDS)
                 .readTimeout(500, TimeUnit.MILLISECONDS)
@@ -188,6 +227,7 @@ public class FinSmartCIG{
     public static List<Opportunities> getOpportunitiesJSON(String token) {
         URL url;
         try {
+            System.setProperty("http.keepAlive", "false");
             url = new URL(smartURLv1+opportunitiesPath);
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod("GET");
@@ -210,7 +250,7 @@ public class FinSmartCIG{
 
     public static LoginJSON getAuthentications(SmartUserDto user) throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
-        String stringResponse = null;
+        String stringResponse;
         HttpPost httpPost = new HttpPost(smartURLv1+authenticationPath);
         final String json = "{\"email\":\""+user.getEmail()+"\",\"actualPassword\":\""+user.getPassword()+"\"}";
         StringEntity entity = new StringEntity(json);

@@ -36,7 +36,7 @@ public class FacturedoUpdater implements Runnable {
         System.out.println(Thread.currentThread().getName() + ":UI Updater - Started - " + getTime());
         start = Instant.now();
         this.queueStr = seeker.getStatus();
-        while (queueStr.getActualSize()!=0 && !queueStr.isCancelled()) {
+        while (queueStr.getActualSize()!=0) {
             try {
                 TimeUnit.SECONDS.sleep(5);
             } catch (InterruptedException e) {

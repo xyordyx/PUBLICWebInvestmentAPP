@@ -2,6 +2,7 @@ package com.gmp.facturedo;
 
 import com.gmp.facturedo.JSON.Auctions;
 import com.gmp.facturedo.JSON.Results;
+import com.gmp.finsmart.JSON.Opportunities;
 import com.gmp.hmviking.LoginJSON;
 import com.gmp.hmviking.ResponseJSON;
 import com.gmp.web.dto.Investment;
@@ -12,7 +13,9 @@ import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.gmp.facturedo.FacturedoCIG.executeInvestment;
 import static com.gmp.hmviking.InvestmentUtil.getTime;
@@ -272,21 +275,19 @@ public class FacturedoUtil {
 
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public static Investment waitForInvoiceInvest(List<Results> results, Investment formInvestment){
-        if(!results.isEmpty()){
-            for(Results rst : results){
-                if(Arrays.stream(rst.getOperation().getId().split("-")).findFirst().get()
-                        .equals(formInvestment.getInvoiceNumber())
-                        && rst.getOperation().getCurrency().equals(formInvestment.getCurrency())){
-                    formInvestment.setResults(rst);
-                    return formInvestment;
-                }
+    public static Investment waitForInvoiceInvest(HashMap<Integer, Results> auctionsMap, Investment formInvestment){
+        for (Map.Entry<Integer, Results> it : auctionsMap.entrySet()) {
+            if(Arrays.stream(it.getValue().getOperation().getId().split("-")).findFirst().get()
+                    .equals(formInvestment.getInvoiceNumber())
+                    && it.getValue().getOperation().getCurrency().equals(formInvestment.getCurrency())){
+                formInvestment.setResults(it.getValue());
+                return formInvestment;
             }
         }
         return formInvestment;
     }
 
-    public static Investment generateAndSubmit(Investment investment, LoginJSON loginJSON) throws IOException {
+    public static Investment generateAndSubmit(Investment investment, LoginJSON loginJSON)  {
         ResponseJSON response;
         String parameters;
         if((investment.getResults().getPercentage_completed()*100) < 100){
@@ -323,5 +324,22 @@ public class FacturedoUtil {
             return gson.fromJson(op2, Auctions.class);
         }
         else return gson.fromJson(op, Auctions.class);
+    }
+
+    public static HashMap<Integer,Results> processAuctions(Auctions jsonList, HashMap<Integer,Results> auctMap){
+        for(Results  auction : jsonList.getResults()){
+            auctMap.put(auction.getId(),auction);
+        }
+        return auctMap;
+    }
+
+    public static String getResultCode(List<Results> jsonList){
+        String concat = "";
+        String temp;
+        for(Results op : jsonList){
+            temp = op.getOperation().getId();
+            concat = concat + temp.substring(0,temp.indexOf("-"))+" ";
+        }
+        return concat;
     }
 }

@@ -2,9 +2,11 @@ package com.gmp.web.dto;
 
 import com.gmp.facturedo.JSON.Results;
 import com.gmp.finsmart.JSON.Opportunities;
+import com.gmp.finsmart.JSON.PhysicalInvoices;
 
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class Investment {
     @NotNull
@@ -27,9 +29,29 @@ public class Investment {
     private boolean autoAdjusted;
     @Transient
     private boolean completed;
-
     @Transient
     private String UIState;
+
+    @Transient
+    private List<String> skipList;
+    @Transient
+    private PhysicalInvoices formCode;
+
+    public PhysicalInvoices getFormCode() {
+        return formCode;
+    }
+
+    public void setFormCode(PhysicalInvoices formCode) {
+        this.formCode = formCode;
+    }
+
+    public List<String> getSkipList() {
+        return skipList;
+    }
+
+    public void setSkipList(List<String> skipList) {
+        this.skipList = skipList;
+    }
 
     public Results getResults() {
         return results;

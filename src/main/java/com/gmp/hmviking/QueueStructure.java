@@ -1,34 +1,50 @@
 package com.gmp.hmviking;
 
-import com.gmp.facturedo.JSON.Results;
-import com.gmp.finsmart.JSON.Opportunities;
+import com.gmp.web.dto.Investment;
 
+import javax.persistence.Transient;
 import java.util.*;
 
 public class QueueStructure {
-    private Queue<List<Opportunities>> queue;
-    private Queue<List<Results>> queueResults;
     private int actualSize;
-    private boolean isCancelled;
     private HashMap<String,Double> balance;
-    private String updateDate;
+    private volatile List<Investment> investmentList;
+    @Transient
+    private boolean transactionStatus;
+    @Transient
+    private String system;
 
-    public QueueStructure(int actualSize, double availableSoles, double availableDollar) {
-        this.queue = new LinkedList<>();
-        this.queueResults = new LinkedList<>();
+    public QueueStructure(int actualSize, double availableSoles, double availableDollar, String system) {
         this.actualSize = actualSize;
-        this.isCancelled = false;
         this.balance = new HashMap<>();
         this.balance.put("pen",availableSoles);
         this.balance.put("usd",availableDollar);
+        this.investmentList = new ArrayList<>();
+        this.system = system;
     }
 
-    public String getUpdateDate() {
-        return updateDate;
+    public String getSystem() {
+        return system;
     }
 
-    public void setUpdateDate(String updateDate) {
-        this.updateDate = updateDate;
+    public void setSystem(String system) {
+        this.system = system;
+    }
+
+    public List<Investment> getInvestmentList() {
+        return investmentList;
+    }
+
+    public void setInvestmentList(List<Investment> investmentList) {
+        this.investmentList = investmentList;
+    }
+
+    public boolean isTransactionStatus() {
+        return transactionStatus;
+    }
+
+    public void setTransactionStatus(boolean transactionStatus) {
+        this.transactionStatus = transactionStatus;
     }
 
     public HashMap<String, Double> getBalance() {
@@ -39,30 +55,6 @@ public class QueueStructure {
         this.balance = balance;
     }
 
-    public Queue<List<Results>> getQueueResults() {
-        return queueResults;
-    }
-
-    public void setQueueResults(Queue<List<Results>> queueResults) {
-        this.queueResults = queueResults;
-    }
-
-    public boolean isCancelled() {
-        return isCancelled;
-    }
-
-    public void setCancelled(boolean cancelled) {
-        isCancelled = cancelled;
-    }
-
-    public Queue<List<Opportunities>> getQueue() {
-        return queue;
-    }
-
-    public void setQueue(Queue<List<Opportunities>> queue) {
-        this.queue = queue;
-    }
-
     public int getActualSize() {
         return actualSize;
     }
@@ -70,4 +62,8 @@ public class QueueStructure {
     public void setActualSize(int actualSize) {
         this.actualSize = actualSize;
     }
+
+
+
+
 }

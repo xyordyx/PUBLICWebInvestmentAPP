@@ -21,6 +21,8 @@ public class Opportunities {
     @Transient
     private double availableBalanceAmount;
     @Transient
+    private double availableBalancePercentage;
+    @Transient
     private String debtorCompanyName;
     @Transient
     private Debtor debtor;
@@ -44,7 +46,8 @@ public class Opportunities {
                          @JsonProperty("v1IdGroup") int v1IdGroup, @JsonProperty("_id") String _id,
                          @JsonProperty("physicalInvoices")List<PhysicalInvoices> physicalInvoices,
                          @JsonProperty("availableBalanceAmount") double availableBalanceAmount,
-                         @JsonProperty("debtorCompanyName") String debtorCompanyName, @JsonProperty("debtor")Debtor debtor) {
+                         @JsonProperty("debtorCompanyName") String debtorCompanyName, @JsonProperty("debtor")Debtor debtor,
+                         @JsonProperty("availableBalancePercentage")Double availableBalancePercentage) {
         this.tem = tem;
         this.currency = currency;
         this.v1IdGroup = v1IdGroup;
@@ -53,6 +56,16 @@ public class Opportunities {
         this.availableBalanceAmount = availableBalanceAmount;
         this.debtorCompanyName = debtorCompanyName;
         this.debtor = debtor;
+        this.availableBalancePercentage = availableBalancePercentage;
+    }
+
+    @JsonGetter("availableBalancePercentage")
+    public double getAvailableBalancePercentage() {
+        return availableBalancePercentage;
+    }
+
+    public void setAvailableBalancePercentage(double availableBalancePercentage) {
+        this.availableBalancePercentage = availableBalancePercentage;
     }
 
     @JsonGetter("debtor")
