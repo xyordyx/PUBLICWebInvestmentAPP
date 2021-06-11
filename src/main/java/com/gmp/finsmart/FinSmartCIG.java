@@ -49,6 +49,55 @@ public class FinSmartCIG{
 
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+    public static ResponseJSON executeInvestment1(String urlParameters, String token) {
+        URL url;
+        ResponseJSON responseJSON = null;
+        String json;
+        try {
+            url = new URL(smartURLv1+financialTransactionsPath);
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("POST");
+
+            con.setRequestProperty("Accept", "application/json, text/plain, */*");
+            con.setRequestProperty("Content-type", "application/json");
+            con.setRequestProperty("Authorization", "Bearer "+token);
+
+            con.setDoOutput(true);
+
+            try(OutputStream os = con.getOutputStream()){
+                byte[] input = urlParameters.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+            int code = con.getResponseCode();
+            System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+"CODE RESPONSE: "+code);
+            BufferedReader br;
+            if (100 <= code && code <= 399) {
+                json = "{\"status\":true}";
+            }
+            else {
+                br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+                String responseLine;
+                StringBuilder response = new StringBuilder();
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                json = "{\"status\":false,\"message\":\""+response+"\"}";
+                System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+"ERROR RESPONSE: "
+                        +response+" Payload:"+urlParameters);
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            responseJSON = objectMapper.readValue(json,ResponseJSON.class);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return responseJSON;
+    }
+
     public static ResponseJSON executeInvestment(String urlParameters, String token) {
         CloseableHttpClient client = HttpClients.createDefault();
         CloseableHttpResponse response;
