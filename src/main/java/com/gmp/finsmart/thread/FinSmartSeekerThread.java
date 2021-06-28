@@ -64,6 +64,7 @@ public class FinSmartSeekerThread extends Thread {
             }
             this.scheduleTime = null;
         }
+        queueStructure.setScheduled(false);
         System.out.println(Thread.currentThread().getName()+ "Seeker:"+getTime() +" STARTED with timeRequest:"+timeRequest);
         start = Instant.now();
         while (queueStructure.getActualSize() !=0 && flag) {

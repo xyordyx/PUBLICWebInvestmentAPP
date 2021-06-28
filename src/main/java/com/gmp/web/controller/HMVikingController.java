@@ -76,7 +76,7 @@ public class HMVikingController {
         actualSize = investmentBlockInv.getInvestmentList().size();
         pool = Executors.newFixedThreadPool(actualSize);
         queueStructure = new QueueStructure(investmentBlockInv.getInvestmentList().size(),
-                balancePEN, balanceUSD,investmentBlockInv.getSystem());
+                balancePEN, balanceUSD,investmentBlockInv.getSystem(),investmentBlockInv.isScheduled());
         if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
             FinSmartSeekerThread seeker = new FinSmartSeekerThread(loginJSON,investmentBlockInv.getScheduledTime(),
                     investmentBlockInv.getTimeRequest(),queueStructure,investmentBlockInv.getInvestmentList(),
@@ -125,7 +125,7 @@ public class HMVikingController {
     private void sendDataUX() {
         if(enabled.get()){
             if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
-                if(!flag && investmentBlockInv.isScheduled()){
+                if(!flag && !queueStructure.isScheduled()){
                     investmentBlockInv.setInvestmentList(setInProgress(investmentBlockInv.getInvestmentList()));
                     flag = true;
                     simpMessagingTemplate.convertAndSend("/finSmart/investments", investmentBlockInv);

@@ -32,6 +32,7 @@ import javax.net.ssl.SSLException;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -56,6 +57,7 @@ public class FinSmartCIG{
         try {
             url = new URL(smartURLv1+financialTransactionsPath);
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+" Investment Initialization");
             con.setRequestMethod("POST");
 
             con.setRequestProperty("Accept", "application/json, text/plain, */*");
@@ -65,7 +67,7 @@ public class FinSmartCIG{
             con.setDoOutput(true);
 
             try(OutputStream os = con.getOutputStream()){
-                byte[] input = urlParameters.getBytes("utf-8");
+                byte[] input = urlParameters.getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
             }
             int code = con.getResponseCode();

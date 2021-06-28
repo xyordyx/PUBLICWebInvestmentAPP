@@ -13,14 +13,26 @@ public class QueueStructure {
     private boolean transactionStatus;
     @Transient
     private String system;
+    @Transient
+    private boolean isScheduled;
 
-    public QueueStructure(int actualSize, double availableSoles, double availableDollar, String system) {
+    public QueueStructure(int actualSize, double availableSoles, double availableDollar, String system,
+                          boolean scheduled) {
         this.actualSize = actualSize;
         this.balance = new HashMap<>();
         this.balance.put("pen",availableSoles);
         this.balance.put("usd",availableDollar);
         this.investmentList = new ArrayList<>();
         this.system = system;
+        this.isScheduled = scheduled;
+    }
+
+    public boolean isScheduled() {
+        return isScheduled;
+    }
+
+    public void setScheduled(boolean scheduled) {
+        isScheduled = scheduled;
     }
 
     public String getSystem() {

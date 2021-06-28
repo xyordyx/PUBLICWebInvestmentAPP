@@ -8,15 +8,12 @@ import com.gmp.service.IReportService;
 import com.gmp.web.dto.Investment;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Instant;
-
 import static com.gmp.hmviking.InvestmentUtil.*;
 
 public class FinSmartInvestorThread extends Thread {
     private QueueStructure queueStr;
     private Investment investment;
     private LoginJSON loginJSON;
-    Instant start = null;
     @Autowired
     private IReportService reportService;
     private User userId;
@@ -35,7 +32,6 @@ public class FinSmartInvestorThread extends Thread {
     @Override
     public void run() {
         System.out.println(Thread.currentThread().getName()+"Invest:"+getTime()+investment.getInvoiceNumber()+ " - STARTED");
-        start = Instant.now();
         if(investment.getOpportunity() != null){
             investment = FinSmartUtil.generateAndSubmit(investment,loginJSON, queueStr.getBalance());
             if(investment.isCompleted()){
