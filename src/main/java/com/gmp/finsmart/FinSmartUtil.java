@@ -17,7 +17,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.gmp.finsmart.FinSmartCIG.*;
+import static com.gmp.finsmart.FinSmartCIGPost.executeInvestment2;
 import static com.gmp.hmviking.InvestmentUtil.getTime;
 
 
@@ -588,7 +588,10 @@ public class FinSmartUtil {
         String parameters;
         ResponseJSON responseJSON;
         parameters = generateJSONInvest(amount, investment.getCurrency(), investment.getOpportunity().getId(),balance);
-        responseJSON = executeInvestment1(parameters,json.getAccessToken());
+        responseJSON = executeInvestment2(parameters,json.getAccessToken());
+        while(responseJSON == null){
+            responseJSON =executeInvestment2(parameters,json.getAccessToken());
+        }
         return responseJSON;
     }
 
@@ -678,9 +681,9 @@ public class FinSmartUtil {
 
     public static Investment waitForInvoiceInvest(String threadName, List<Opportunities> opportunities,
                                                   List<Investment> invList){
-        String concat = "";
+        StringBuilder concat = new StringBuilder();
         for(Opportunities op : opportunities){
-            concat = concat+op.getPhysicalInvoices().get(0).getCode()+"("+op.getAvailableBalanceAmount()+")"+" ";
+            concat.append(op.getPhysicalInvoices().get(0).getCode()).append("(").append(op.getAvailableBalanceAmount()).append(")").append(" ");
             for(Investment inv : invList){
                 if(op.getPhysicalInvoices().contains(inv.getFormCode()) && op.getCurrency().equals(inv.getCurrency())){
                     inv.setOpportunity(op);
