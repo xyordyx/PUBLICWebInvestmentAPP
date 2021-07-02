@@ -35,7 +35,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.gmp.finsmart.FinSmartCIG.*;
 import static com.gmp.hmviking.InvestmentUtil.*;
 import static com.gmp.hmviking.InvestmentUtil.updateInvestment;
 
@@ -169,9 +168,9 @@ public class HMVikingController {
         }
         System.out.println("Login successfully - OK - "+getTime());
         model.addAttribute("investmentForm", new InvestmentForm());
-        FinancialTransactions financialTransactions = getFinancialTransactions(loginJSON.getAccessToken());
-        invoices = getInvoices(loginJSON.getAccessToken());
-        finsmartData = reportService.processFinancialTransactions(financialTransactions,invoices,userId);
+        FinancialTransactions financialTransactions = FinSmartCIG.getFinancialTransactions(loginJSON.getAccessToken());
+        invoices = FinSmartCIG.getInvoices(loginJSON.getAccessToken());
+         finsmartData = reportService.processFinancialTransactions(financialTransactions,invoices,userId);
         System.out.println("Financial transactions processed - OK - "+getTime());
 
         balancePEN = finsmartData.getSolesAmountAvailable();

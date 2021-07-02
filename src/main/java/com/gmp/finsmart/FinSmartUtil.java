@@ -17,7 +17,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.gmp.finsmart.FinSmartCIGPost.executeInvestment2;
+import static com.gmp.finsmart.FinSmartCIG.executeInvestment1;
 import static com.gmp.hmviking.InvestmentUtil.getTime;
 
 
@@ -588,9 +588,9 @@ public class FinSmartUtil {
         String parameters;
         ResponseJSON responseJSON;
         parameters = generateJSONInvest(amount, investment.getCurrency(), investment.getOpportunity().getId(),balance);
-        responseJSON = executeInvestment2(parameters,json.getAccessToken());
+        responseJSON = executeInvestment1(parameters,json.getAccessToken());
         while(responseJSON == null){
-            responseJSON =executeInvestment2(parameters,json.getAccessToken());
+            responseJSON =executeInvestment1(parameters,json.getAccessToken());
         }
         return responseJSON;
     }
@@ -598,51 +598,65 @@ public class FinSmartUtil {
     public static Investment generateAndSubmit(Investment investment, LoginJSON loginJSON,
                                                HashMap<String,Double> balance) {
         ResponseJSON responseJSON;
-        double amountSubmit = 0;
         if(investment.getOpportunity().getAvailableBalanceAmount() >= investment.getAmount()){
             responseJSON = postToFinSmart(investment.getAmount(),investment,balance,loginJSON);
-            if(responseJSON.isStatus()){
-                amountSubmit = investment.getAmount();
-                investment.setStatus("true");
-            }else{
-                if(responseJSON.getMessage().replace('"',' ').equals(amountBigger)){
-                    //FEATURE:IF AMOUNT IS BIGGER INVEST 30% LESS
-                    double adjustment = (investment.getAmount()-(investment.getAmount()*0.30));
-                    if(adjustment > 100){
-                        responseJSON = postToFinSmart(adjustment,investment,balance,loginJSON);
-                    }
-                    if(responseJSON.isStatus()){
-                        amountSubmit = adjustment;
-                        investment.setStatus("true");
-                    }
-                }else {
-                    investment.setStatus("false");
-                    investment.setMessage(responseJSON.getMessage());
+            //TODO: IMPLEMENTAR LOGICA while(responseJSON.getMessage().equals(PARKED))
+            //TODO: Thread.sleep(SOME TIME);
+            //TODO: responseJSON = postToFinSmart(investment.getAmount(),investment,balance,loginJSON);
+            if(responseJSON.getMessage().replace('"',' ').equals(amountBigger)){
+                //FEATURE:IF AMOUNT IS BIGGER INVEST 30% LESS //TODO WILL BE REPLACED BY NEXT TODO
+                double adjustment = (investment.getAmount()-(investment.getAmount()*0.30));
+                if(adjustment > 100){
+                    responseJSON = postToFinSmart(adjustment,investment,balance,loginJSON);
+                    investment = updateInvestment(investment,responseJSON,4);
+                    investment.setAdjustedAmount(adjustment);
                 }
-            }
-        }else {
+                //TODO GetOpportunities for Investment
+                // postToFinsmart
+            }else investment = updateInvestment(investment,responseJSON,1);
+        } else
             //Feature: Auto investment to the current Invoice amount available
             if(investment.getOpportunity().getAvailableBalanceAmount() > 0){
                 responseJSON = postToFinSmart(investment.getOpportunity().getAvailableBalanceAmount(),investment,
                         balance,loginJSON);
-                if(responseJSON.isStatus()){
-                    amountSubmit = investment.getOpportunity().getAvailableBalanceAmount();
-                    investment.setAutoAdjusted(true);
-                    investment.setAdjustedAmount(investment.getOpportunity().getAvailableBalanceAmount());
-                    investment.setStatus("true");
-                    investment.setMessage("");
-                }
+                investment = updateInvestment(investment,responseJSON,2);
             }else{
-                investment.setStatus("false");
-                investment.setMessage("AMOUNT AVAILABLE IS 0.00");
+                investment = updateInvestment(investment,null,3);
             }
-        }
+
         investment.setCompleted(true);
         System.out.println(Thread.currentThread().getName()+"Invest:"+getTime()+
                 investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" "+
                 investment.getOpportunity().getDebtor().getCompanyName()+" STATUS: "+
-                investment.getStatus()+" Amount:"+amountSubmit+ " MSG:"+investment.getMessage());
+                investment.getStatus()+ " MSG:"+investment.getMessage());
 
+        return investment;
+    }
+
+    public static Investment updateInvestment(Investment investment, ResponseJSON responseJSON, int status){
+        if(responseJSON == null || status == 3) {
+            investment.setStatus("false");
+            investment.setMessage("AMOUNT AVAILABLE IS 0.00");
+        }else{
+            if (responseJSON.isStatus() && status == 1) {
+                investment.setStatus("true");
+            } else if (!responseJSON.isStatus() && status == 1) {
+                investment.setStatus("false");
+                investment.setMessage(responseJSON.getMessage());
+            } else if (status == 2) {
+                investment.setAutoAdjusted(true);
+                investment.setAdjustedAmount(investment.getOpportunity().getAvailableBalanceAmount());
+                investment.setStatus("true");
+                investment.setMessage("");
+            } else if (responseJSON.isStatus() && status == 4) {
+                investment.setAutoAdjusted(true);
+                investment.setStatus("true");
+                investment.setMessage("");
+            } else if (!responseJSON.isStatus() && status == 4) {
+                investment.setStatus("false");
+                investment.setMessage(responseJSON.getMessage());
+            }
+        }
         return investment;
     }
 
@@ -655,35 +669,12 @@ public class FinSmartUtil {
                 "\",\"type\":\"investment\"}";
     }
 
-    public static Investment waitForInvoiceInvest(HashMap<String,Opportunities> oppMap, Investment formInvestment){
-        for (Map.Entry<String, Opportunities> it : oppMap.entrySet()) {
-            if(!formInvestment.getSkipList().contains(it.getKey())) {
-                if(it.getValue().getPhysicalInvoices().contains(formInvestment.getFormCode()) &&
-                        it.getValue().getCurrency().equals(formInvestment.getCurrency())){
-                    formInvestment.setOpportunity(it.getValue());
-                    return formInvestment;
-                }else formInvestment.getSkipList().add(it.getKey());
-            }
-        }
-        return formInvestment;
-    }
-
-    public static Investment waitForInvoiceInvest(List<Opportunities> opportunities, Investment formInvestment){
-        for(Opportunities op : opportunities){
-            if(op.getPhysicalInvoices().contains(formInvestment.getFormCode()) &&
-                    op.getCurrency().equals(formInvestment.getCurrency())){
-                formInvestment.setOpportunity(op);
-                return formInvestment;
-            }
-        }
-        return formInvestment;
-    }
-
     public static Investment waitForInvoiceInvest(String threadName, List<Opportunities> opportunities,
                                                   List<Investment> invList){
         StringBuilder concat = new StringBuilder();
         for(Opportunities op : opportunities){
-            concat.append(op.getPhysicalInvoices().get(0).getCode()).append("(").append(op.getAvailableBalanceAmount()).append(")").append(" ");
+            concat.append(op.getPhysicalInvoices().get(0).getCode()).append("(").append(op.getAvailableBalanceAmount())
+                    .append(")").append(" ");
             for(Investment inv : invList){
                 if(op.getPhysicalInvoices().contains(inv.getFormCode()) && op.getCurrency().equals(inv.getCurrency())){
                     inv.setOpportunity(op);
@@ -725,13 +716,5 @@ public class FinSmartUtil {
 
     public static String getAppUrl(HttpServletRequest request) {
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-    }
-
-    public static HashMap<String,Opportunities> processOpportunities
-            (List<Opportunities> jsonList, HashMap<String,Opportunities> oppMap){
-        for(Opportunities op : jsonList){
-            oppMap.put(op.getId(),op);
-        }
-        return oppMap;
     }
 }

@@ -1,6 +1,6 @@
 package com.gmp.finsmart.thread;
 
-import com.gmp.finsmart.FinSmartCIGSeeker;
+import com.gmp.finsmart.FinSmartSeekerImpl;
 import com.gmp.finsmart.FinSmartUtil;
 import com.gmp.finsmart.JSON.Opportunities;
 import com.gmp.hmviking.LoginJSON;
@@ -52,7 +52,7 @@ public class FinSmartSeekerThread extends Thread {
     @Override
     public void run() {
         pool = Executors.newFixedThreadPool(investmentList.size());
-        FinSmartCIGSeeker seeker = new FinSmartCIGSeeker(loginJSON.getAccessToken());
+        FinSmartSeekerImpl seeker = new FinSmartSeekerImpl(loginJSON.getAccessToken());
         if(this.scheduleTime != null) {
             System.out.println(Thread.currentThread().getName() + ":Seeker - scheduled - " + getTime());
             try {

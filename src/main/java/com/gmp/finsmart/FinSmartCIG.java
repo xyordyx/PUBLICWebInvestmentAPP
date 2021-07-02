@@ -63,6 +63,8 @@ public class FinSmartCIG{
             con.setRequestProperty("Accept", "application/json, text/plain, */*");
             con.setRequestProperty("Content-type", "application/json");
             con.setRequestProperty("Authorization", "Bearer "+token);
+            con.setConnectTimeout(500);
+            con.setReadTimeout(500);
 
             con.setDoOutput(true);
 
@@ -94,6 +96,8 @@ public class FinSmartCIG{
             e.printStackTrace();
         } catch (ProtocolException e) {
             e.printStackTrace();
+        }catch (java.net.SocketTimeoutException e) {
+            System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -294,7 +298,7 @@ public class FinSmartCIG{
         }  catch (SocketTimeoutException e) {
             System.out.println("Opportunities finsmart: 250 milliseconds elapsed on request - "+getTime());
         }catch (Throwable e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
         return null;
     }
