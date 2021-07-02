@@ -41,22 +41,6 @@ public class FinSmartInvestorThread extends Thread {
             }
         }
      }
-
-    public void updateBalance(){
-        if(this.investment.isAutoAdjusted()){
-            if(this.investment.getCurrency().equals("pen")){
-                this.queueStr.getBalance().put("pen",
-                        (this.queueStr.getBalance().get("pen"))-this.investment.getAdjustedAmount());
-            }else  this.queueStr.getBalance().put("usd",
-                    (this.queueStr.getBalance().get("usd"))-this.investment.getAdjustedAmount());
-        }else {
-            if(this.investment.getCurrency().equals("pen")){
-                this.queueStr.getBalance().put("pen",
-                        (this.queueStr.getBalance().get("pen"))-this.investment.getAmount());
-            }else  this.queueStr.getBalance().put("usd",
-                    (this.queueStr.getBalance().get("usd"))-this.investment.getAmount());
-        }
-    }
 }
 
 
