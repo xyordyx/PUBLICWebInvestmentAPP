@@ -64,7 +64,6 @@ public class FinSmartCIG{
             con.setRequestProperty("Content-type", "application/json");
             con.setRequestProperty("Authorization", "Bearer "+token);
             con.setConnectTimeout(500);
-            con.setReadTimeout(500);
 
             con.setDoOutput(true);
 
