@@ -106,8 +106,9 @@ public class FinSmartCIG{
     public static ResponseJSON executeInvestment2(String urlParameters, String token) {
         ResponseJSON responseJSON = null;
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(500, TimeUnit.MILLISECONDS)
+                .connectTimeout(400, TimeUnit.MILLISECONDS)
                 .build();
+        System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+" Investment Initialization");
         RequestBody body = RequestBody.create(
                 MediaType.parse("application/json"), urlParameters);
         Request request = new Request.Builder()
@@ -126,7 +127,7 @@ public class FinSmartCIG{
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 responseJSON = objectMapper.readValue(json,ResponseJSON.class);
             }else{
-                String json = "{\"status\":false,\"message\":\""+response.message()+"\"}";
+                String json = "{\"status\":false,\"message\":\""+response.body().string()+"\"}";
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 responseJSON = objectMapper.readValue(json,ResponseJSON.class);
