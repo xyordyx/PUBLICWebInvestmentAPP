@@ -586,11 +586,10 @@ public class FinSmartUtil {
     public static ResponseJSON postToFinSmart(double amount, Investment investment, HashMap<String,Double> balance,
                                               LoginJSON json){
         String parameters;
-        ResponseJSON responseJSON;
+        ResponseJSON responseJSON = null;
         parameters = generateJSONInvest(amount, investment.getCurrency(), investment.getOpportunity().getId(),balance);
-        responseJSON = executeInvestment1(parameters,json.getAccessToken());
         while(responseJSON == null){
-            responseJSON =executeInvestment1(parameters,json.getAccessToken());
+            responseJSON = FinSmartCIG.executeInvestment2(parameters,json.getAccessToken());
         }
         return responseJSON;
     }

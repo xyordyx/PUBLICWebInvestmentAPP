@@ -63,7 +63,7 @@ public class FinSmartCIG{
             con.setRequestProperty("Accept", "application/json, text/plain, */*");
             con.setRequestProperty("Content-type", "application/json");
             con.setRequestProperty("Authorization", "Bearer "+token);
-            con.setConnectTimeout(500);
+            //con.setConnectTimeout(500);
 
             con.setDoOutput(true);
 
@@ -99,6 +99,42 @@ public class FinSmartCIG{
             System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        return responseJSON;
+    }
+
+    public static ResponseJSON executeInvestment2(String urlParameters, String token) {
+        ResponseJSON responseJSON = null;
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(500, TimeUnit.MILLISECONDS)
+                .build();
+        RequestBody body = RequestBody.create(
+                MediaType.parse("application/json"), urlParameters);
+        Request request = new Request.Builder()
+                .url(smartURLv1+financialTransactionsPath)
+                .addHeader("Accept", "application/json, text/plain, */*")
+                .addHeader("Content-type", "application/json")
+                .addHeader("Authorization", "Bearer "+token)
+                .post(body)
+                .build();
+        Call call = client.newCall(request);
+        try {
+            Response response = call.execute();
+            if(response.code() == HttpURLConnection.HTTP_CREATED) {
+                String json = "{\"status\":true}";
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                responseJSON = objectMapper.readValue(json,ResponseJSON.class);
+            }else{
+                String json = "{\"status\":false,\"message\":\""+response.message()+"\"}";
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                responseJSON = objectMapper.readValue(json,ResponseJSON.class);
+                System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+"ERROR RESPONSE: "
+                        +responseJSON.getMessage()+" Payload:"+urlParameters);
+            }
+        } catch (IOException e) {
+            System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+e.getMessage());
         }
         return responseJSON;
     }
