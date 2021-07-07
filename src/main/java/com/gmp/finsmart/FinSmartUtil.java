@@ -692,7 +692,7 @@ public class FinSmartUtil {
         else if (i>10 && i <=15){
             return gson.fromJson(op3, founderListType);
         }
-        else if (i>60 && i <=80){
+        else if (i>20 && i <=30){
             return gson.fromJson(op4, founderListType);
         }
         else return gson.fromJson(op, founderListType);
