@@ -122,7 +122,7 @@ public class FinSmartCIG{
         try {
             Response response = call.execute();
             if(response.code() == HttpURLConnection.HTTP_CREATED) {
-                String json = "{\"status\":true}";
+                String json = "{\"status\":true,\"message\":\"\"}";
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 responseJSON = objectMapper.readValue(json,ResponseJSON.class);

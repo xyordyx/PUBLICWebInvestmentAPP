@@ -601,26 +601,28 @@ public class FinSmartUtil {
             //TODO: IMPLEMENTAR LOGICA while(responseJSON.getMessage().equals(PARKED))
             //TODO: Thread.sleep(SOME TIME);
             //TODO: responseJSON = postToFinSmart(investment.getAmount(),investment,balance,loginJSON);
-            if(responseJSON.getMessage().replace('"',' ').equals(amountBigger)){
+            if (responseJSON.getMessage().replace('"',' ').equals(amountBigger)){
                 //FEATURE:IF AMOUNT IS BIGGER INVEST 30% LESS //TODO WILL BE REPLACED BY NEXT TODO
-                double adjustment = (investment.getAmount()-(investment.getAmount()*0.30));
-                if(adjustment > 100){
-                    responseJSON = postToFinSmart(adjustment,investment,balance,loginJSON);
-                    investment = updateInvestment(investment,responseJSON,4);
+                double adjustment = (investment.getAmount() - (investment.getAmount() * 0.30));
+                if (adjustment > 100) {
+                    responseJSON = postToFinSmart(adjustment, investment, balance, loginJSON);
+                    investment = updateInvestment(investment, responseJSON, 4);
                     investment.setAdjustedAmount(adjustment);
                 }
                 //TODO GetOpportunities for Investment
                 // postToFinsmart
-            }else investment = updateInvestment(investment,responseJSON,1);
-        } else
+            } else investment = updateInvestment(investment, responseJSON, 1);
+
+        } else {
             //Feature: Auto investment to the current Invoice amount available
-            if(investment.getOpportunity().getAvailableBalanceAmount() > 0){
-                responseJSON = postToFinSmart(investment.getOpportunity().getAvailableBalanceAmount(),investment,
-                        balance,loginJSON);
-                investment = updateInvestment(investment,responseJSON,2);
-            }else{
-                investment = updateInvestment(investment,null,3);
+            if (investment.getOpportunity().getAvailableBalanceAmount() > 0) {
+                responseJSON = postToFinSmart(investment.getOpportunity().getAvailableBalanceAmount(), investment,
+                        balance, loginJSON);
+                investment = updateInvestment(investment, responseJSON, 2);
+            } else {
+                investment = updateInvestment(investment, null, 3);
             }
+        }
 
         investment.setCompleted(true);
         System.out.println(Thread.currentThread().getName()+"Invest:"+getTime()+
