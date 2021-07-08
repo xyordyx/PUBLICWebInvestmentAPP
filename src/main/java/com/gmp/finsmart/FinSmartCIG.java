@@ -105,6 +105,7 @@ public class FinSmartCIG{
 
     public static ResponseJSON executeInvestment2(String urlParameters, String token) {
         ResponseJSON responseJSON = null;
+        Response response = null;
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(400, TimeUnit.MILLISECONDS)
                 .build();
@@ -120,7 +121,7 @@ public class FinSmartCIG{
                 .build();
         Call call = client.newCall(request);
         try {
-            Response response = call.execute();
+            response = call.execute();
             if(response.code() == HttpURLConnection.HTTP_CREATED) {
                 String json = "{\"status\":true,\"message\":\"\"}";
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -136,6 +137,8 @@ public class FinSmartCIG{
             }
         } catch (IOException e) {
             System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+e.getMessage());
+        }finally {
+            response.body().close();
         }
         return responseJSON;
     }
