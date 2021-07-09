@@ -135,11 +135,10 @@ public class FinSmartCIG{
                 responseJSON = objectMapper.readValue(json,ResponseJSON.class);
                 System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+"ERROR RESPONSE: "
                         +responseJSON.getMessage()+" Payload:"+urlParameters);
+                response.body().close();
             }
         } catch (IOException e) {
             System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+e.getMessage());
-        }finally {
-            response.body().close();
         }
         return responseJSON;
     }
