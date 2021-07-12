@@ -108,7 +108,7 @@ public class FinSmartCIG{
         Response response = null;
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(400, TimeUnit.MILLISECONDS)
-                .callTimeout(600,TimeUnit.MILLISECONDS)
+                //.callTimeout(3000,TimeUnit.MILLISECONDS)
                 .build();
         System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+" Investment Initialization");
         RequestBody body = RequestBody.create(
