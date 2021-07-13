@@ -596,18 +596,20 @@ public class FinSmartUtil {
     public static Investment generateAndSubmit(Investment investment, LoginJSON loginJSON,
                                                HashMap<String,Double> balance) {
         ResponseJSON responseJSON;
+        double actualAmount =0;
         if(investment.getOpportunity().getAvailableBalanceAmount() >= investment.getAmount()){
             responseJSON = postToFinSmart(investment.getAmount(),investment,balance,loginJSON);
+            actualAmount = investment.getAmount();
             //TODO: IMPLEMENTAR LOGICA while(responseJSON.getMessage().equals(PARKED))
             //TODO: Thread.sleep(SOME TIME);
             //TODO: responseJSON = postToFinSmart(investment.getAmount(),investment,balance,loginJSON);
             if (responseJSON.getMessage().replace('"',' ').equals(amountBigger)){
                 //FEATURE:IF AMOUNT IS BIGGER INVEST 30% LESS //TODO WILL BE REPLACED BY NEXT TODO
-                double adjustment = (investment.getAmount() - (investment.getAmount() * 0.30));
-                if (adjustment > 100) {
-                    responseJSON = postToFinSmart(adjustment, investment, balance, loginJSON);
+                actualAmount = (investment.getAmount() - (investment.getAmount() * 0.30));
+                if (actualAmount > 100) {
+                    responseJSON = postToFinSmart(actualAmount, investment, balance, loginJSON);
                     investment = updateInvestment(investment, responseJSON, 4);
-                    investment.setAdjustedAmount(adjustment);
+                    investment.setAdjustedAmount(actualAmount);
                 }
                 //TODO GetOpportunities for Investment
                 // postToFinsmart
@@ -618,6 +620,7 @@ public class FinSmartUtil {
             if (investment.getOpportunity().getAvailableBalanceAmount() > 0) {
                 responseJSON = postToFinSmart(investment.getOpportunity().getAvailableBalanceAmount(), investment,
                         balance, loginJSON);
+                actualAmount = investment.getOpportunity().getAvailableBalanceAmount();
                 investment = updateInvestment(investment, responseJSON, 2);
             } else {
                 investment = updateInvestment(investment, null, 3);
@@ -628,7 +631,7 @@ public class FinSmartUtil {
         System.out.println(Thread.currentThread().getName()+"Invest:"+getTime()+
                 investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" "+
                 investment.getOpportunity().getDebtor().getCompanyName()+" STATUS: "+
-                investment.getStatus()+ " MSG:"+investment.getMessage());
+                investment.getStatus()+ " MSG:"+investment.getMessage()+" Amount:"+actualAmount);
 
         return investment;
     }
