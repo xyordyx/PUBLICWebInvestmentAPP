@@ -59,7 +59,6 @@ public class FinSmartCIG{
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+" Investment Initialization");
             con.setRequestMethod("POST");
-
             con.setRequestProperty("Accept", "application/json, text/plain, */*");
             con.setRequestProperty("Content-type", "application/json");
             con.setRequestProperty("Authorization", "Bearer "+token);
@@ -75,7 +74,7 @@ public class FinSmartCIG{
             System.out.println(Thread.currentThread().getName()+"CIGReq:"+getTime()+"CODE RESPONSE: "+code);
             BufferedReader br;
             if (100 <= code && code <= 399) {
-                json = "{\"status\":true}";
+                json = "{\"status\":true,\"message\":\"\"}";
             }
             else {
                 br = new BufferedReader(new InputStreamReader(con.getErrorStream()));

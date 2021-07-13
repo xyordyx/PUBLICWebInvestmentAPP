@@ -588,7 +588,7 @@ public class FinSmartUtil {
         ResponseJSON responseJSON = null;
         parameters = generateJSONInvest(amount, investment.getCurrency(), investment.getOpportunity().getId(),balance);
         while(responseJSON == null){
-            responseJSON = FinSmartCIG.executeInvestment2(parameters,json.getAccessToken());
+            responseJSON = FinSmartCIG.executeInvestment1(parameters,json.getAccessToken());
         }
         return responseJSON;
     }
