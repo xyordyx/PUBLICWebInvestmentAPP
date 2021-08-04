@@ -175,8 +175,8 @@ public class HMVikingController {
 
         balancePEN = finsmartData.getSolesAmountAvailable();
         balanceUSD = finsmartData.getDollarAmountAvailable();
-        model.addAttribute("balancePEN", formatter.format(balancePEN));
-        model.addAttribute("balanceUSD", formatter.format(balanceUSD));
+        model.addAttribute("balancePEN", balancePEN);
+        model.addAttribute("balanceUSD", balanceUSD);
         model.addAttribute("totalInvestedPEN", formatter.format(finsmartData.getSolesCurrentInvested()));
         model.addAttribute("totalInvestedUSD", formatter.format(finsmartData.getDollarCurrentInvested()));
         model.addAttribute("totalInvested", formatter.format(finsmartData.getSolesCurrentInvested() +
