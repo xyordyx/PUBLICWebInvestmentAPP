@@ -133,9 +133,11 @@ public class ReportService implements IReportService{
         Map<String,InvoiceTransactions> invoicesIndexed = FinSmartUtil.indexInvoices(invoices);
         FinsmartData smartData = new FinsmartData();
         for (Transactions financialTransactions : transactions.getFinancialTransactions()) {
-            double amountInvested = 0;
-            double amountExpected = 0;
-            double sum = 0;
+            double amountInvested;
+            double amountExpected;
+            double amountOnRisk;
+            double tempOnRisk = 0;
+            double sum;
             //TOTAL DEPOSITED
             if (financialTransactions.getType().equals("deposit") && financialTransactions.getStatus().equals("approved")) {
                 if (financialTransactions.getCurrency().equals("pen")) {
@@ -167,19 +169,27 @@ public class ReportService implements IReportService{
             }
             else if (financialTransactions.getType().equals("investment") && financialTransactions.getStatus().equals("in progress")) {
                 if(invoicesIndexed.containsKey(financialTransactions.getInvoice().get_id())) {
-                    double tempProfit = FinSmartUtil.calculateROI(invoicesIndexed.get(financialTransactions.getInvoice().get_id()).getTem(),
-                            invoicesIndexed.get(financialTransactions.getInvoice().get_id()).getMinimumDuration(),
-                            financialTransactions.getAmount());
+                    InvoiceTransactions currentTransact = invoicesIndexed.get(financialTransactions.getInvoice().get_id());
+                    double tempProfit = FinSmartUtil.calculateROI(currentTransact.getTem(),
+                            currentTransact.getMinimumDuration(), financialTransactions.getAmount());
+                    //21 DAYS TO INCLUDE INTO RISK
+                    if(currentTransact.getToBeCollectedIn().equals("En mora") && currentTransact.getMoraDays() > 21) {
+                        tempOnRisk = financialTransactions.getAmount();
+                    }
                     if (financialTransactions.getCurrency().equals("pen")) {
                         amountInvested = smartData.getSolesCurrentInvested() + financialTransactions.getAmount();
                         amountExpected = smartData.getSolesProfitExpected() + tempProfit;
+                        amountOnRisk = smartData.getSolesOnRisk() + tempOnRisk;
                         smartData.setSolesCurrentInvested(amountInvested);
                         smartData.setSolesProfitExpected(amountExpected);
+                        smartData.setSolesOnRisk(amountOnRisk);
                     } else {
                         amountInvested = smartData.getDollarCurrentInvested() + financialTransactions.getAmount();
                         amountExpected = smartData.getDollarProfitExpected() + tempProfit;
+                        amountOnRisk = smartData.getDollarOnRisk() + tempOnRisk;
                         smartData.setDollarCurrentInvested(amountInvested);
                         smartData.setDollarProfitExpected(amountExpected);
+                        smartData.setDollarOnRisk(amountOnRisk);
                     }
                     financialTransactions.setExpectedProfit(tempProfit);
                     financialTransactions.setInvoiceAppend(invoicesIndexed.get(financialTransactions.getInvoice().get_id()));
@@ -224,7 +234,7 @@ public class ReportService implements IReportService{
         cal.setTime(financialTransactions.getCreatedAt());
         int month = cal.get(Calendar.MONTH)+1;
         int year = cal.get(Calendar.YEAR);
-        double data = 0;
+        double data;
         HistoricalData updateData = dataRepository.getByMonthAndYearByUser(month,year,userId);
         if(financialTransactions.getCurrency().equals("usd")){
             data = financialTransactions.getAmount() * conversionFactor;
@@ -255,7 +265,7 @@ public class ReportService implements IReportService{
         cal.setTime(financialTransactions.getCreatedAt());
         int month = cal.get(Calendar.MONTH)+1;
         int year = cal.get(Calendar.YEAR);
-        double data = 0;
+        double data;
         HistoricalData updateData = dataRepository.getByMonthAndYearByUser(month,year,userId);
         if(financialTransactions.getCurrency().equals("usd")){
             data = financialTransactions.getAmount() * conversionFactor;
@@ -290,7 +300,7 @@ public class ReportService implements IReportService{
         int month = profitExpected.get(Calendar.MONTH)+1;
         int year = profitExpected.get(Calendar.YEAR);
 
-        double data = 0;
+        double data;
         HistoricalData updateData = dataRepository.getByMonthAndYearByUser(month,year,userId);
         if(financialTransactions.getCurrency().equals("usd")){
             data = financialTransactions.getExpectedProfit() * conversionFactor;
@@ -356,15 +366,12 @@ public class ReportService implements IReportService{
         daysAfter.add(Calendar.DATE,15);
         Calendar daysBefore = Calendar.getInstance();
         daysBefore.add(Calendar.DATE,-15);
-        if(daysBefore.before(investment) && daysAfter.after(investment)) {
-            return true;
-        }
-        return false;
+        return daysBefore.before(investment) && daysAfter.after(investment);
     }
 
     @Override
     public List<InvoiceTransactions> getFinalizedInvoices(List<InvoiceTransactions> invoices) {
-        List<InvoiceTransactions> finalized = new ArrayList<InvoiceTransactions>();
+        List<InvoiceTransactions> finalized = new ArrayList<>();
         for(InvoiceTransactions inv : invoices){
             if(inv.getStatus().equals("finalized")){
                 inv.setPastDueDays(getDuePastDays(inv));

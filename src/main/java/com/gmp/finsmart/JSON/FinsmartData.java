@@ -38,6 +38,11 @@ public class FinsmartData {
     private double dollarRetentions;
 
     @Transient
+    private double solesOnRisk;
+    @Transient
+    private double dollarOnRisk;
+
+    @Transient
     private Map<String,Transactions> depositedIndex;
     @Transient
     private Map<String,Transactions> retentionsIndex;
@@ -47,10 +52,10 @@ public class FinsmartData {
     private Map<String,Transactions> currentInvestmentsIndex;
 
     public FinsmartData() {
-        this.depositedIndex = new HashMap<String, Transactions>();
-        this.retentionsIndex = new HashMap<String, Transactions>();
-        this.totalProfitIndex = new HashMap<String, Transactions>();
-        this.currentInvestmentsIndex = new HashMap<String, Transactions>();
+        this.depositedIndex = new HashMap<>();
+        this.retentionsIndex = new HashMap<>();
+        this.totalProfitIndex = new HashMap<>();
+        this.currentInvestmentsIndex = new HashMap<>();
     }
 
     public Map<String, Transactions> getCurrentInvestmentsIndex() {
@@ -179,5 +184,21 @@ public class FinsmartData {
 
     public void setDollarProfitExpected(double dollarProfitExpected) {
         this.dollarProfitExpected = dollarProfitExpected;
+    }
+
+    public double getSolesOnRisk() {
+        return solesOnRisk;
+    }
+
+    public void setSolesOnRisk(double solesOnRisk) {
+        this.solesOnRisk = solesOnRisk;
+    }
+
+    public double getDollarOnRisk() {
+        return dollarOnRisk;
+    }
+
+    public void setDollarOnRisk(double dollarOnRisk) {
+        this.dollarOnRisk = dollarOnRisk;
     }
 }

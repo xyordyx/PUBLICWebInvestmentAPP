@@ -224,37 +224,37 @@
 
                 <!-- DASHBOARD KPIs-->
                 <div class="row mb-xl-4 mb-0 justify-content-center  ">
-                    <div class="col-12 col-sm-6 col-xl-2 mb-4 mb-xl-0">
+                    <div class="col-12 col-sm-6 col-xl-3 mb-4 mb-xl-0">
                         <div class="card redial-bg-dark redial-border-link redial-shadow text-white">
                             <div class="card-body">
                                 <div class="media d-block d-sm-flex text-center text-sm-left">
                                     <div class="media-body">
                                         <div class="fact-boxPEN text-center ">
-                                            <p class="mb-2">Available to Invest</p>
+                                            <h5>Available to Invest</h5>
                                             <h2 id="balancePEN"
-                                                class="counter_number mb-1 redial-font-weight-400 text-warning">${balancePEN}
+                                                class="counter_number mb-1 redial-font-weight-700 text-warning">${balancePEN}
                                             </h2>
                                         </div>
                                         <div class="fact-boxUSD text-center">
                                             <h2 id="balanceUSD"
-                                                class="counter_number mb-1 redial-font-weight-400 text-success">${balanceUSD} </h2>
+                                                class="counter_number mb-1 redial-font-weight-700 text-success">${balanceUSD} </h2>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-xl-2 mb-4 mb-xl-0">
+                    <div class="col-12 col-sm-6 col-xl-3 mb-4 mb-xl-0">
                         <div class="card  redial-shadow redial-bg-fb text-white">
                             <div class="card-body">
                                 <div class="media d-block d-sm-flex text-center text-sm-left">
                                     <div class="media-body">
                                         <div class="fact-boxPEN text-center">
-                                            <p class="mb-2">Invested in progress</p>
-                                            <h2 class="counter_number mb-1 redial-font-weight-400 text-white">${totalInvestedPEN} </h2>
+                                            <h5>Invested in progress</h5>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${totalInvestedPEN} </h2>
                                         </div>
                                         <div class="fact-boxUSD text-center">
-                                            <h2 class="counter_number mb-1 redial-font-weight-400 text-white">${totalInvestedUSD} </h2>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${totalInvestedUSD} </h2>
                                         </div>
                                         <div id="accordion3" role="tablist">
                                             <div class="mb-2 text-center">
@@ -265,7 +265,7 @@
                                                     <div class="redial-divider"></div>
                                                     <div class="fact-boxPEN text-center">
                                                         <p class="mb-2">Total in progress *</p>
-                                                        <h4 class="counter_number mb-1 redial-font-weight-400 text-white">${totalInvested}</h4>
+                                                        <h4 class="counter_number mb-1 redial-font-weight-700 text-white">${totalInvested}</h4>
                                                     </div>
                                                 </div>
                                             </div>
@@ -275,17 +275,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-xl-2 mb-4 mb-xl-0">
+                    <div class="col-12 col-sm-6 col-xl-3 mb-4 mb-xl-0">
                         <div class="card redial-bg-success redial-border-success redial-shadow text-white">
                             <div class="card-body">
                                 <div class="media d-block d-sm-flex text-center text-sm-left">
                                     <div class="media-body">
                                         <div class="fact-boxPEN text-center">
-                                            <p class="mb-2">Total Profit</p>
-                                            <h2 class="counter_number mb-1 redial-font-weight-400 text-white">${totalProfitPEN} </h2>
+                                            <h5>Total Profit</h5>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${totalProfitPEN} </h2>
                                         </div>
                                         <div class="fact-boxUSD text-center">
-                                            <h2 class="counter_number mb-1 redial-font-weight-400 text-white">${totalProfitUSD} </h2>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${totalProfitUSD} </h2>
                                         </div>
                                         <div id="accordion4" role="tablist">
                                             <div class="mb-2 text-center">
@@ -296,7 +296,7 @@
                                                     <div class="redial-divider"></div>
                                                     <div class="fact-boxPEN text-center">
                                                         <p class="mb-2">Accumulated Profit *</p>
-                                                        <h4 class="counter_number mb-1 redial-font-weight-400 text-white">${totalProfit}</h4>
+                                                        <h4 class="counter_number mb-1 redial-font-weight-700 text-white">${totalProfit}</h4>
                                                     </div>
                                                 </div>
                                             </div>
@@ -306,17 +306,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-xl-2 mb-4 mb-xl-0">
-                        <div class="card redial-bg-goog redial-border-twi redial-shadow text-white">
+                </div>
+                <div class="row mb-xl-4 mb-0 justify-content-center  ">
+                    <div class="col-12 col-sm-6 col-xl-3 mb-4 mb-xl-0">
+                        <div class="card redial-bg-link redial-border-twi redial-shadow text-white">
                             <div class="card-body">
                                 <div class="media d-block d-sm-flex text-center text-sm-left">
                                     <div class="media-body">
                                         <div class="fact-boxPEN text-center">
-                                            <p class="mb-2">Total Transferred</p>
-                                            <h2 class="counter_number mb-1 redial-font-weight-400 text-white">${totalDepositsPEN} </h2>
+                                            <h5>Total Transferred</h5>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${totalDepositsPEN} </h2>
                                         </div>
                                         <div class="fact-boxUSD text-center">
-                                            <h2 class="counter_number mb-1 redial-font-weight-400 text-white">${totalDepositsUSD} </h2>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${totalDepositsUSD} </h2>
                                         </div>
                                         <div id="accordion5" role="tablist">
                                             <div class="mb-2 text-center">
@@ -327,7 +329,7 @@
                                                     <div class="redial-divider"></div>
                                                     <div class="fact-boxPEN text-center">
                                                         <p class="mb-2">Total Transferred *</p>
-                                                        <h4 class="counter_number mb-1 redial-font-weight-400 text-white">${totalDeposits}</h4>
+                                                        <h4 class="counter_number mb-1 redial-font-weight-700 text-white">${totalDeposits}</h4>
                                                     </div>
                                                 </div>
                                             </div>
@@ -337,17 +339,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-xl-2 mb-4 mb-xl-0">
+                    <div class="col-12 col-sm-6 col-xl-3 mb-4 mb-xl-0">
                         <div class="card bg-secondary redial-shadow text-white">
                             <div class="card-body">
                                 <div class="media d-block d-sm-flex text-center text-sm-left">
                                     <div class="media-body">
                                         <div class="fact-boxPEN text-center">
-                                            <p class="mb-2">Profit Forecast</p>
-                                            <h2 class="counter_number mb-1 redial-font-weight-400 text-white">${expectedProfitPEN} </h2>
+                                            <h5>Profit Forecast</h5>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${expectedProfitPEN} </h2>
                                         </div>
                                         <div class="fact-boxUSD text-center">
-                                            <h2 class="counter_number mb-1 redial-font-weight-400 text-white">${expectedProfitUSD} </h2>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${expectedProfitUSD} </h2>
                                         </div>
                                         <div id="accordion6" role="tablist">
                                             <div class="mb-2 text-center">
@@ -358,7 +360,38 @@
                                                     <div class="redial-divider"></div>
                                                     <div class="fact-boxPEN text-center">
                                                         <p class="mb-2">Total Forecasted *</p>
-                                                        <h4 class="counter_number mb-1 redial-font-weight-400 text-white">${expectedProfit}</h4>
+                                                        <h4 class="counter_number mb-1 redial-font-weight-700 text-white">${expectedProfit}</h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3 mb-4 mb-xl-0">
+                        <div class="card redial-bg-goog redial-border-twi redial-shadow text-white">
+                            <div class="card-body">
+                                <div class="media d-block d-sm-flex text-center text-sm-left">
+                                    <div class="media-body">
+                                        <div class="fact-boxPEN text-center">
+                                            <h5>On Risk</h5>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${onRiskPEN} </h2>
+                                        </div>
+                                        <div class="fact-boxUSD text-center">
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${onRiskUSD} </h2>
+                                        </div>
+                                        <div id="accordion7" role="tablist">
+                                            <div class="mb-2 text-center">
+                                                <a class="redial-dark" data-toggle="collapse" href="#collapse7" aria-expanded="true" aria-controls="collapse1">
+                                                    <i class="fa fa-plus-square pr-2"></i>
+                                                </a>
+                                                <div id="collapse7" class="collapse" role="tabpanel" data-parent="#accordion7">
+                                                    <div class="redial-divider"></div>
+                                                    <div class="fact-boxPEN text-center">
+                                                        <p class="mb-2">Total On Risk *</p>
+                                                        <h4 class="counter_number mb-1 redial-font-weight-700 text-white">${totalOnRisk}</h4>
                                                     </div>
                                                 </div>
                                             </div>

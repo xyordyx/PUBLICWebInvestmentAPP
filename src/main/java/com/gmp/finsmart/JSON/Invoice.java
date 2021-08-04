@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Invoice {
     @Transient
-    private String debtorCompanyName;
+    private Debtor debtor;
     @Transient
     private List<PhysicalInvoices> physicalInvoices;
     @Transient
@@ -16,19 +16,18 @@ public class Invoice {
     @Override
     public String toString() {
         return "Invoice{" +
-                "debtorCompanyName='" + debtorCompanyName + '\'' +
                 ", physicalInvoices=" + physicalInvoices +
                 ", _id='" + _id + '\'' +
                 '}';
     }
 
-    @JsonGetter("debtorCompanyName")
-    public String getDebtorCompanyName() {
-        return debtorCompanyName;
+    @JsonGetter("debtor")
+    public Debtor getDebtor() {
+        return debtor;
     }
 
-    public void setDebtorCompanyName(String debtorCompanyName) {
-        this.debtorCompanyName = debtorCompanyName;
+    public void setDebtor(Debtor debtor) {
+        this.debtor = debtor;
     }
 
     @JsonGetter("physicalInvoices")

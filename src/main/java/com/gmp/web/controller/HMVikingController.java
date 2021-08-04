@@ -175,8 +175,8 @@ public class HMVikingController {
 
         balancePEN = finsmartData.getSolesAmountAvailable();
         balanceUSD = finsmartData.getDollarAmountAvailable();
-        model.addAttribute("balancePEN", balancePEN);
-        model.addAttribute("balanceUSD", balanceUSD);
+        model.addAttribute("balancePEN", formatter.format(balancePEN));
+        model.addAttribute("balanceUSD", formatter.format(balanceUSD));
         model.addAttribute("totalInvestedPEN", formatter.format(finsmartData.getSolesCurrentInvested()));
         model.addAttribute("totalInvestedUSD", formatter.format(finsmartData.getDollarCurrentInvested()));
         model.addAttribute("totalInvested", formatter.format(finsmartData.getSolesCurrentInvested() +
@@ -193,6 +193,10 @@ public class HMVikingController {
         model.addAttribute("expectedProfitUSD", formatter.format(finsmartData.getDollarProfitExpected()));
         model.addAttribute("expectedProfit", formatter.format(finsmartData.getSolesProfitExpected() +
                 (finsmartData.getDollarProfitExpected()*currencyFactor)));
+        model.addAttribute("onRiskPEN", formatter.format(finsmartData.getSolesOnRisk()));
+        model.addAttribute("onRiskUSD", formatter.format(finsmartData.getDollarOnRisk()));
+        model.addAttribute("totalOnRisk", formatter.format(finsmartData.getSolesOnRisk() +
+                (finsmartData.getDollarOnRisk()*currencyFactor)));
 
         session.setAttribute("finalizedInv",reportService.getFinalizedInvoices(invoices));
         session.setAttribute("investments",finsmartData.getCurrentInvestmentsIndex());
