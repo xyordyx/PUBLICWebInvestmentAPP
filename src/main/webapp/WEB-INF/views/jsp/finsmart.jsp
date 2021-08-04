@@ -276,27 +276,27 @@
                         </div>
                     </div>
                     <div class="col-12 col-sm-6 col-xl-3 mb-4 mb-xl-0">
-                        <div class="card redial-bg-success redial-border-success redial-shadow text-white">
+                        <div class="card bg-secondary redial-shadow text-white">
                             <div class="card-body">
                                 <div class="media d-block d-sm-flex text-center text-sm-left">
                                     <div class="media-body">
                                         <div class="fact-boxPEN text-center">
-                                            <h5>Total Profit</h5>
-                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${totalProfitPEN} </h2>
+                                            <h5>Profit Forecast</h5>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${expectedProfitPEN} </h2>
                                         </div>
                                         <div class="fact-boxUSD text-center">
-                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${totalProfitUSD} </h2>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${expectedProfitUSD} </h2>
                                         </div>
-                                        <div id="accordion4" role="tablist">
+                                        <div id="accordion6" role="tablist">
                                             <div class="mb-2 text-center">
-                                                <a class="redial-dark" data-toggle="collapse" href="#collapse4" aria-expanded="true" aria-controls="collapse1">
+                                                <a class="redial-dark" data-toggle="collapse" href="#collapse6" aria-expanded="true" aria-controls="collapse1">
                                                     <i class="fa fa-plus-square pr-2"></i>
                                                 </a>
-                                                <div id="collapse4" class="collapse" role="tabpanel" data-parent="#accordion4">
+                                                <div id="collapse6" class="collapse" role="tabpanel" data-parent="#accordion6">
                                                     <div class="redial-divider"></div>
                                                     <div class="fact-boxPEN text-center">
-                                                        <p class="mb-2">Accumulated Profit *</p>
-                                                        <h4 class="counter_number mb-1 redial-font-weight-700 text-white">${totalProfit}</h4>
+                                                        <p class="mb-2">Total Forecasted *</p>
+                                                        <h4 class="counter_number mb-1 redial-font-weight-700 text-white">${expectedProfit}</h4>
                                                     </div>
                                                 </div>
                                             </div>
@@ -340,27 +340,27 @@
                         </div>
                     </div>
                     <div class="col-12 col-sm-6 col-xl-3 mb-4 mb-xl-0">
-                        <div class="card bg-secondary redial-shadow text-white">
+                        <div class="card redial-bg-success redial-border-success redial-shadow text-white">
                             <div class="card-body">
                                 <div class="media d-block d-sm-flex text-center text-sm-left">
                                     <div class="media-body">
                                         <div class="fact-boxPEN text-center">
-                                            <h5>Profit Forecast</h5>
-                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${expectedProfitPEN} </h2>
+                                            <h5>Total Profit</h5>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${totalProfitPEN} </h2>
                                         </div>
                                         <div class="fact-boxUSD text-center">
-                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${expectedProfitUSD} </h2>
+                                            <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${totalProfitUSD} </h2>
                                         </div>
-                                        <div id="accordion6" role="tablist">
+                                        <div id="accordion4" role="tablist">
                                             <div class="mb-2 text-center">
-                                                <a class="redial-dark" data-toggle="collapse" href="#collapse6" aria-expanded="true" aria-controls="collapse1">
+                                                <a class="redial-dark" data-toggle="collapse" href="#collapse4" aria-expanded="true" aria-controls="collapse1">
                                                     <i class="fa fa-plus-square pr-2"></i>
                                                 </a>
-                                                <div id="collapse6" class="collapse" role="tabpanel" data-parent="#accordion6">
+                                                <div id="collapse4" class="collapse" role="tabpanel" data-parent="#accordion4">
                                                     <div class="redial-divider"></div>
                                                     <div class="fact-boxPEN text-center">
-                                                        <p class="mb-2">Total Forecasted *</p>
-                                                        <h4 class="counter_number mb-1 redial-font-weight-700 text-white">${expectedProfit}</h4>
+                                                        <p class="mb-2">Accumulated Profit *</p>
+                                                        <h4 class="counter_number mb-1 redial-font-weight-700 text-white">${totalProfit}</h4>
                                                     </div>
                                                 </div>
                                             </div>
