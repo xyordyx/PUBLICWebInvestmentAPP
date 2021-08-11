@@ -110,33 +110,33 @@
                     <div class="col-12 col-md-12 mb-4 col-xl-10 center-block">
                         <div class="card redial-border-light redial-bg-secondry-light redial-shadow mb-4">
                             <div class="card-body">
-                                    <form id="bookForm" name="bookForm" action="finsmart" method="POST" class="form-horizontal">
-                                        <%
-                                            if ("true".equals(request.getParameter("error"))) {
-                                        %>
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            <strong>There was an error at the investment form. </strong> Please complete all the fields.
-                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <%
-                                            }
-                                        %>
-                                        <div class="form-group" data-book-index="0">
-                                            <div class="query">
+                                <form id="bookForm" name="bookForm" action="finsmart" method="POST" class="form-horizontal">
+                                    <%
+                                        if ("true".equals(request.getParameter("error"))) {
+                                    %>
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        <strong>There was an error at the investment form. </strong> Please complete all the fields.
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <%
+                                        }
+                                    %>
+                                    <div class="form-group" data-book-index="0">
+                                        <div class="query">
                                             <a class="redial-dark d-block p-3 border redial-border-light">
                                                 <div class="col-xs-4">
                                                     <div class="input-group form-group">
                                                         <span class="input-group-addon"><i class="fa fa-clone"></i></span>
                                                         <input type="text" class="form-control test" id="invoiceNumber" name="invoiceNumber" placeholder="Invoice ID" required/>
-                                                </div>
+                                                    </div>
                                                 </div>
                                                 <div class="col-xs-4">
-                                                        <div class="input-group form-group">
-                                                            <span class="input-group-addon"><i class="fa fa-money"></i></span>
-                                                            <input type="number" class="form-control" id="amount" name="amount"
-                                                                   placeholder="Amount" onkeyup="autoSum();" required/>
+                                                    <div class="input-group form-group">
+                                                        <span class="input-group-addon"><i class="fa fa-money"></i></span>
+                                                        <input type="number" class="form-control" id="amount" name="amount"
+                                                               placeholder="Amount" onkeyup="autoSum();" required/>
                                                     </div>
                                                 </div>
                                                 <div class="col-xs-2">
@@ -149,12 +149,12 @@
                                                     <button type="button" class="btn btn-primary addButton"><i class="fa fa-plus"></i></button>
                                                 </div>
                                             </a>
-                                            </div>
                                         </div>
+                                    </div>
 
-                                        <!-- The template for adding new field -->
-                                        <div class="form-group hide" id="bookTemplate">
-                                            <div class="query">
+                                    <!-- The template for adding new field -->
+                                    <div class="form-group hide" id="bookTemplate">
+                                        <div class="query">
                                             <a class="redial-dark d-block p-3 border redial-border-light">
                                                 <div class="col-xs-4 col-xs-offset-1">
                                                     <div class="input-group form-group">
@@ -165,8 +165,8 @@
                                                 <div class="col-xs-4">
                                                     <div class="input-group form-group">
                                                         <span class="input-group-addon"><i class="fa fa-money"></i></span>
-                                                            <input type="number" class="form-control" name="amount"
-                                                                   placeholder="Amount" onkeyup="autoSum();"/>
+                                                        <input type="number" class="form-control" name="amount"
+                                                               placeholder="Amount" onkeyup="autoSum();"/>
                                                     </div>
                                                 </div>
                                                 <div class="col-xs-2">
@@ -180,42 +180,42 @@
                                                     <button type="button" class="btn btn-primary addButton"><i class="fa fa-plus"></i></button>
                                                 </div>
                                             </a>
-                                            </div>
                                         </div>
+                                    </div>
 
-                                        <label><h7><strong>Time of execution</strong></h7></label>
-                                        <div class="form-group form-check form-check-inline">
-                                            <input onclick="check(this);" class="radioCheck" value="none" name="scheduledTime" type="checkbox" id="now" checked>
-                                            <label for="now" class="redial-dark mb-0">Now!</label>
-                                        </div>
-                                        <div class="form-group form-check form-check-inline">
-                                            <input onclick="check(this);" class="radioCheck" value="12:25" name="scheduledTime" type="checkbox" id="12">
-                                            <label for="12" class="redial-dark mb-0">12:25</label>
-                                        </div>
-                                        <div class="form-group form-check form-check-inline">
-                                            <input onclick="check(this);" class="radioCheck" value="17:25" name="scheduledTime" type="checkbox" id="17">
-                                            <label for="17" class="redial-dark mb-0">17:25</label>
-                                        </div>
-                                        <div class="form-group form-check form-check-inline">
-                                            <input onclick="check(this);" class="radioCheck" value="" type="checkbox" id="custom">
-                                            <label for="custom" class="redial-dark mb-0">Custom</label>
-                                        </div>
+                                    <label><h7><strong>Time of execution</strong></h7></label>
+                                    <div class="form-group form-check form-check-inline">
+                                        <input onclick="check(this);" class="radioCheck" value="none" name="scheduledTime" type="checkbox" id="now" checked>
+                                        <label for="now" class="redial-dark mb-0">Now!</label>
+                                    </div>
+                                    <div class="form-group form-check form-check-inline">
+                                        <input onclick="check(this);" class="radioCheck" value="12:25" name="scheduledTime" type="checkbox" id="12">
+                                        <label for="12" class="redial-dark mb-0">12:25</label>
+                                    </div>
+                                    <div class="form-group form-check form-check-inline">
+                                        <input onclick="check(this);" class="radioCheck" value="17:25" name="scheduledTime" type="checkbox" id="17">
+                                        <label for="17" class="redial-dark mb-0">17:25</label>
+                                    </div>
+                                    <div class="form-group form-check form-check-inline">
+                                        <input onclick="check(this);" class="radioCheck" value="" type="checkbox" id="custom">
+                                        <label for="custom" class="redial-dark mb-0">Custom</label>
+                                    </div>
 
-                                        <div class="form-group form-check form-check-inline" id="customField" style="display:none">
-                                            <div class="input-group form-group">
-                                                <span class="input-group-addon"><i class="fa fa-calendar-times-o"></i></span>
-                                                <input type="text" data-masked="" name="scheduledTime" data-inputmask="'mask': '99:99'" id="customTime" placeholder="Custom Time" class="form-control">
-                                            </div>
+                                    <div class="form-group form-check form-check-inline" id="customField" style="display:none">
+                                        <div class="input-group form-group">
+                                            <span class="input-group-addon"><i class="fa fa-calendar-times-o"></i></span>
+                                            <input type="text" data-masked="" name="scheduledTime" data-inputmask="'mask': '99:99'" id="customTime" placeholder="Custom Time" class="form-control">
                                         </div>
+                                    </div>
 
-                                        <div class="form-group form-check form-check-inline">
-                                            <div class="input-group form-group">
-                                                <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
-                                                <input type="text" data-masked="" name="timeRequest" data-inputmask="'mask': '9.99'" id="timeRequest" placeholder="Time Request" class="form-control">
-                                            </div>
+                                    <div class="form-group form-check form-check-inline">
+                                        <div class="input-group form-group">
+                                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                            <input type="text" data-masked="" name="timeRequest" data-inputmask="'mask': '9.99'" id="timeRequest" placeholder="Time Request" class="form-control">
                                         </div>
-                                        <button type="submit" class="btn btn-block p-2 btn-outline-success shadowed"><i class="fa fa-bolt pr-2"></i>Invest!</button>
-                                    </form>
+                                    </div>
+                                    <button type="submit" class="btn btn-block p-2 btn-outline-success shadowed"><i class="fa fa-bolt pr-2"></i>Invest!</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -281,7 +281,7 @@
                                 <div class="media d-block d-sm-flex text-center text-sm-left">
                                     <div class="media-body">
                                         <div class="fact-boxPEN text-center">
-                                            <h5>Profit Forecast</h5>
+                                            <h5>Forecast Profit</h5>
                                             <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${expectedProfitPEN} </h2>
                                         </div>
                                         <div class="fact-boxUSD text-center">
@@ -376,7 +376,7 @@
                                 <div class="media d-block d-sm-flex text-center text-sm-left">
                                     <div class="media-body">
                                         <div class="fact-boxPEN text-center">
-                                            <h5>On Risk</h5>
+                                            <h5>On Risk (21 days)</h5>
                                             <h2 class="counter_number mb-1 redial-font-weight-700 text-white">${onRiskPEN} </h2>
                                         </div>
                                         <div class="fact-boxUSD text-center">
@@ -409,12 +409,12 @@
     </div>
 
 
-<!-- End main-content-->
+    <!-- End main-content-->
 
-<!-- Top To Bottom--> <a href="#" class="scrollup text-center redial-bg-primary redial-rounded-circle-50 ">
+    <!-- Top To Bottom--> <a href="#" class="scrollup text-center redial-bg-primary redial-rounded-circle-50 ">
     <h4 class="text-white mb-0"><i class="icofont icofont-long-arrow-up"></i></h4>
 </a>
-<!-- End Top To Bottom-->
+    <!-- End Top To Bottom-->
 
     <!-- Actual investments -->
     <div class="modal fade" id="actualInvestments" tabindex="-1" role="dialog" aria-labelledby="actualInvestments" aria-hidden="true">
@@ -576,196 +576,210 @@
     <!-- End finalized investments -->
 
 
-<!-- Latest Investments MODAL -->
-<div class="modal fade" id="latestInv" tabindex="-1" role="dialog" aria-labelledby="latestInv" aria-hidden="true">
-    <div class="modal-dialog  modal-lg" role="document">
-        <div class="modal-content redial-border-light">
-            <div class="modal-header redial-border-light">
-                <h5 class="modal-title pt-2" id="exampleModalLabel">Latest Investments</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="false">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <c:forEach var="latestInv" items="${latestInvestments}">
-                    <div class="col-12 col-sm-5 col-xl-3 mb-7 mb-xl-3 py-2">
-                        <div class="card redial-border-light redial-shadow">
-                            <div class="card-body">
-                                <h7 class="mb-1 redial-font-weight-400 text-p">Invoice ID </h7>
-                                <span class="badge badge-primary text-success pull-right">${latestInv.dateTime}</span>
-                                <h5 class="mb-2 text-warning">${latestInv.invoiceNumber}</h5>
-                                <div class="media-body">
-                                    <div class="fact-box${latestInv.currency} text-center text-sm-right">
-                                        <h2 id="amount_${latestInv.invoiceNumber}" class="counter_number text-white">
-                                                ${latestInv.amount}
-                                        </h2>
-                                    </div>
-                                    <c:if test="${latestInv.status == true}">
-                                        <c:choose>
-                                            <c:when test="${latestInv.autoAdjusted == true}">
+    <!-- Latest Investments MODAL -->
+    <div class="modal fade" id="latestInv" tabindex="-1" role="dialog" aria-labelledby="latestInv" aria-hidden="true">
+        <div class="modal-dialog  modal-lg" role="document">
+            <div class="modal-content redial-border-light">
+                <div class="modal-header redial-border-light">
+                    <h5 class="modal-title pt-2" id="exampleModalLabel">Latest Investments</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="false">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <c:forEach var="latestInv" items="${latestInvestments}">
+                        <div class="col-12 col-sm-5 col-xl-3 mb-7 mb-xl-3 py-2">
+                            <div class="card redial-border-light redial-shadow">
+                                <div class="card-body">
+                                    <h7 class="mb-1 redial-font-weight-400 text-p">Invoice ID </h7>
+                                    <span class="badge badge-primary text-success pull-right">${latestInv.dateTime}</span>
+                                    <h5 class="mb-2 text-warning">${latestInv.invoiceNumber}</h5>
+                                    <div class="media-body">
+                                        <div class="fact-box${latestInv.currency} text-center text-sm-right">
+                                            <h2 id="amount_${latestInv.invoiceNumber}" class="counter_number text-white">
+                                                    ${latestInv.amount}
+                                            </h2>
+                                        </div>
+                                        <c:if test="${latestInv.status == true}">
+                                            <c:choose>
+                                                <c:when test="${latestInv.autoAdjusted == true}">
                                                 <span id="status_${latestInv.invoiceNumber}"
                                                       class="badge p-2 badge-success text-white">Investment Successfully
                                                 </span>
-                                                <div class="text-success">
-                                                    <p id="customer_${latestInv.invoiceNumber}" class="mb-2">
-                                                            ${latestInv.razonSocial}
-                                                    </p>
-                                                </div>
-                                                <div class="text-info">
-                                                    <p id="message_${latestInv.invoiceNumber}" class="mb-2">
-                                                        Amount: was AUTO adjusted from ${latestInv.currency} ${latestInv.amount} to
-                                                            ${latestInv.currency} ${latestInv.adjustedAmount}
-                                                    </p>
-                                                </div>
-                                            </c:when>
-                                            <c:otherwise>
+                                                    <div class="text-success">
+                                                        <p id="customer_${latestInv.invoiceNumber}" class="mb-2">
+                                                                ${latestInv.razonSocial}
+                                                        </p>
+                                                    </div>
+                                                    <div class="text-info">
+                                                        <p id="message_${latestInv.invoiceNumber}" class="mb-2">
+                                                            Amount: was AUTO adjusted from ${latestInv.currency} ${latestInv.amount} to
+                                                                ${latestInv.currency} ${latestInv.adjustedAmount}
+                                                        </p>
+                                                    </div>
+                                                </c:when>
+                                                <c:otherwise>
                                                 <span id="status_${latestInv.invoiceNumber}"
                                                       class="badge p-2 badge-success text-white">Investment Successfully
                                                 </span>
-                                                <div class="text-success">
-                                                    <p id="customer_${latestInv.invoiceNumber}" class="mb-2">
-                                                            ${latestInv.razonSocial}
-                                                    </p>
-                                                </div>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:if>
-                                    <c:if test="${latestInv.status == false}">
+                                                    <div class="text-success">
+                                                        <p id="customer_${latestInv.invoiceNumber}" class="mb-2">
+                                                                ${latestInv.razonSocial}
+                                                        </p>
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:if>
+                                        <c:if test="${latestInv.status == false}">
                                         <span id="status_${latestInv.invoiceNumber}"
                                               class="badge p-2 badge-danger text-white">Error
                                         </span>
-                                        <div class="text-danger">
-                                            <p id="message_${latestInv.invoiceNumber}" class="mb-2">
-                                                    ${latestInv.message}
-                                            </p>
-                                        </div>
-                                    </c:if>
+                                            <div class="text-danger">
+                                                <p id="message_${latestInv.invoiceNumber}" class="mb-2">
+                                                        ${latestInv.message}
+                                                </p>
+                                            </div>
+                                        </c:if>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </c:forEach>
-            </div>
-            <div class="modal-footer redial-border-light">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </c:forEach>
+                </div>
+                <div class="modal-footer redial-border-light">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!--End Latest Investments MODAL -->
-<!--ROI Calculator-->
-<div class="l_c_h ">
-    <div class="c_h">
-        <div class="left_c">
-            <div class="left right_c left_icons">
-                <a href="#" class="mini text-danger" style="font-size:23px;">+</a>
+    <!--End Latest Investments MODAL -->
+    <!--ROI Calculator-->
+    <div class="l_c_h ">
+        <div class="c_h">
+            <div class="left_c">
+                <div class="left right_c left_icons">
+                    <a href="#" class="mini text-danger" style="font-size:23px;">+</a>
+                </div>
+                <div class="left center_icons"><!--center_icons-->
+                     Extra Tools
+                </div><!--end center_icons-->
             </div>
-            <div class="left center_icons"><!--center_icons-->
-                ROI Calculator
-            </div><!--end center_icons-->
+            <div class="clear"></div>
         </div>
-        <div class="clear"></div>
-    </div>
-    <div class="chat_container" style="display: none;">
+        <div class="chat_container" style="display: none;">
             <div class="card-body">
                 <form>
                     <div class="form-group">
-                        <label class="redial-font-weight-400">Monthy Rate %</label>
-                        <input id="rate" type="text" class="form-control" placeholder="Rate %" onkeyup="convert();"/>
-                    </div>
-                    <div class="form-group">
-                        <label class="redial-font-weight-400">Days</label>
+                        <label class="redial-font-weight-400">* Days</label>
                         <input id="days" type="text" class="form-control" placeholder="Days" onkeyup="convert();"/>
                     </div>
                     <div class="form-group">
-                        <label class="redial-font-weight-400">Amount to Invest</label>
+                        <label class="redial-font-weight-400">* Monthy Rate %</label>
+                        <input id="rate" type="text" class="form-control" placeholder="Rate %" onkeyup="convert();"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="redial-font-weight-400">* Amount to Invest</label>
                         <input id="amountInv" type="text" class="form-control" placeholder="Amount" onkeyup="convert();"/>
                     </div>
                     <div class="form-group">
+                        <label class="redial-font-weight-600 bg-light">Pay Off Date</label>
+                        <input id="payOffDate" type="text" class="form-control text-capitalize bg-secondary text-info" placeholder="Pay Off" readonly disabled/>
+                    </div>
+                    <div class="form-group">
                         <label class="redial-font-weight-600">ROI</label>
-                        <input id="roi" type="text" class="form-control text-capitalize" placeholder="ROI" readonly disabled/>
+                        <input id="roi" type="text" class="form-control text-capitalize bg-secondary text-info" placeholder="ROI" readonly disabled/>
                     </div>
                 </form>
             </div>
         </div>
 
-</div>
-<!--END ROI Calculator-->
-<script>
-    function autoSum(){
-        var totalPEN = parseInt(${balancePEN}, 10);
-        var totalUSD = parseInt(${balanceUSD}, 10);
-        var sumPEN = totalPEN;
-        var sumUSD = totalUSD;
+    </div>
+    <!--END ROI Calculator-->
+    <script>
+        function autoSum(){
+            var totalPEN = parseInt(${balancePEN}, 10);
+            var totalUSD = parseInt(${balanceUSD}, 10);
+            var sumPEN = totalPEN;
+            var sumUSD = totalUSD;
 
 
-        $('div[class="query"]').each(function(index,item){
-            var childAmount = item.children[0].children[1].children[0].children[1].value;
-            var childCurency = item.children[0].children[2].children[0].options.selectedIndex;
-            if (childAmount != null) {
-                var number = +childAmount;
-                if(childCurency == 0){
-                    sumPEN = sumPEN - number;
-                }else{
-                    sumUSD = sumUSD - number;
+            $('div[class="query"]').each(function(index,item){
+                var childAmount = item.children[0].children[1].children[0].children[1].value;
+                var childCurency = item.children[0].children[2].children[0].options.selectedIndex;
+                if (childAmount != null) {
+                    var number = +childAmount;
+                    if(childCurency == 0){
+                        sumPEN = sumPEN - number;
+                    }else{
+                        sumUSD = sumUSD - number;
+                    }
+                }
+            });
+            document.getElementById('balancePEN').innerHTML = sumPEN;
+            document.getElementById('balanceUSD').innerHTML = sumUSD;
+        }
+
+        function convert(){
+            rate = document.getElementById('rate').value
+            days = document.getElementById('days').value
+            var payDate = new Date(new Date().getTime()+(days*24*60*60*1000));
+            var ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(payDate);
+            var mo = new Intl.DateTimeFormat('en', { month: 'short' }).format(payDate);
+            var da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(payDate);
+            amountInv = document.getElementById('amountInv').value
+            document.getElementById('payOffDate').value = da+'-'+mo+'-'+ye;
+            document.getElementById('roi').value = (((rate/30)*amountInv*days)*0.01).toFixed(2);
+
+        }
+
+        Date.prototype.addDays = function(days) {
+            var date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
+        }
+
+        function check(input)
+        {
+            var checkboxes = document.getElementsByClassName("radioCheck");
+            for(var i = 0; i < checkboxes.length; i++)
+            {
+                //uncheck all
+                if(checkboxes[i].checked == true)
+                {
+                    checkboxes[i].checked = false;
                 }
             }
-        });
-        document.getElementById('balancePEN').innerHTML = sumPEN;
-        document.getElementById('balanceUSD').innerHTML = sumUSD;
-    }
 
-    function convert(){
-        rate = document.getElementById('rate').value
-        days = document.getElementById('days').value
-        amountInv = document.getElementById('amountInv').value
-
-        document.getElementById('roi').value = (((rate/30)*amountInv*days)*0.01).toFixed(2);
-
-    }
-
-    function check(input)
-    {
-        var checkboxes = document.getElementsByClassName("radioCheck");
-        for(var i = 0; i < checkboxes.length; i++)
-        {
-            //uncheck all
-            if(checkboxes[i].checked == true)
+            //set checked of clicked object
+            if(input.checked == true)
             {
-                checkboxes[i].checked = false;
+                input.checked = false;
             }
+            else
+            {
+                input.checked = true;
+            }
+            if(input.id === 'custom'){
+                $("#customField").show();
+            }else $("#customField").hide();
         }
 
-        //set checked of clicked object
-        if(input.checked == true)
-        {
-            input.checked = false;
-        }
-        else
-        {
-            input.checked = true;
-        }
-        if(input.id === 'custom'){
-            $("#customField").show();
-        }else $("#customField").hide();
-    }
-
-    $(function(){
-        $(".c_h").click(function(e) {
-            if ($(".chat_container").is(":visible")) {
-                $(".c_h .right_c .mini").text("+")
-            } else {
-                $(".c_h .right_c .mini").text("-")
-            }
-            $(".chat_container").slideToggle("slow");
-            return false
+        $(function(){
+            $(".c_h").click(function(e) {
+                if ($(".chat_container").is(":visible")) {
+                    $(".c_h .right_c .mini").text("+")
+                } else {
+                    $(".c_h .right_c .mini").text("-")
+                }
+                $(".chat_container").slideToggle("slow");
+                return false
+            });
         });
-    });
-</script>
+    </script>
 
-<!-- jQuery -->
-<script src="${contextPath}/resources/s2/dist/js/plugins.min.js"></script>
-<script src="${contextPath}/resources/s2/dist/js/common.js"></script>
+    <!-- jQuery -->
+    <script src="${contextPath}/resources/s2/dist/js/plugins.min.js"></script>
+    <script src="${contextPath}/resources/s2/dist/js/common.js"></script>
 </div>
 </body>
 </html>
