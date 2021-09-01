@@ -33,10 +33,10 @@ public class FinSmartInvestorThread extends Thread {
     public void run() {
         System.out.println(Thread.currentThread().getName()+"Invest:"+getTime()+investment.getInvoiceNumber()+ " - STARTED");
         if(investment.getOpportunity() != null){
-            investment = FinSmartUtil.generateAndSubmit(investment,loginJSON, queueStr.getBalance());
+            investment = FinSmartUtil.generateAndSubmit(investment,loginJSON);
             if(investment.isCompleted()){
                 queueStr.setActualSize(queueStr.getActualSize()-1);
-                reportService.updateInvestmentStatus(investment,userId,systemId);
+                //reportService.updateInvestmentStatus(investment,userId,systemId);
                 queueStr.getInvestmentList().add(investment);
             }
         }

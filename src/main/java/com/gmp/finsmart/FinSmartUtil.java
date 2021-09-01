@@ -9,12 +9,19 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.gmp.hmviking.InvestmentUtil.getTime;
@@ -582,23 +589,22 @@ public class FinSmartUtil {
                 .collect(Collectors.toList());
     }
 
-    public static ResponseJSON postToFinSmart(double amount, Investment investment, HashMap<String,Double> balance,
+    public static ResponseJSON postToFinSmart(double amount, Investment investment,
                                               LoginJSON json){
         String parameters;
         ResponseJSON responseJSON = null;
-        parameters = generateJSONInvest(amount, investment.getCurrency(), investment.getOpportunity().getId(),balance);
+        parameters = generateJSONInvest(amount, investment.getCurrency(), investment.getOpportunity().getId());
         while(responseJSON == null){
             responseJSON = FinSmartCIG.executeInvestment1(parameters,json.getAccessToken());
         }
         return responseJSON;
     }
 
-    public static Investment generateAndSubmit(Investment investment, LoginJSON loginJSON,
-                                               HashMap<String,Double> balance) {
+    public static Investment generateAndSubmit(Investment investment, LoginJSON loginJSON) {
         ResponseJSON responseJSON;
         double actualAmount =0;
         if(investment.getOpportunity().getAvailableBalanceAmount() >= investment.getAmount()){
-            responseJSON = postToFinSmart(investment.getAmount(),investment,balance,loginJSON);
+            responseJSON = postToFinSmart(investment.getAmount(),investment,loginJSON);
             actualAmount = investment.getAmount();
             //TODO: IMPLEMENTAR LOGICA while(responseJSON.getMessage().equals(PARKED))
             //TODO: Thread.sleep(SOME TIME);
@@ -607,7 +613,7 @@ public class FinSmartUtil {
                 //FEATURE:IF AMOUNT IS BIGGER INVEST 30% LESS //TODO WILL BE REPLACED BY NEXT TODO
                 actualAmount = (investment.getAmount() - (investment.getAmount() * 0.30));
                 if (actualAmount > 100) {
-                    responseJSON = postToFinSmart(actualAmount, investment, balance, loginJSON);
+                    responseJSON = postToFinSmart(actualAmount, investment, loginJSON);
                     investment = updateInvestment(investment, responseJSON, 4);
                     investment.setAdjustedAmount(actualAmount);
                 }
@@ -618,8 +624,7 @@ public class FinSmartUtil {
         } else {
             //Feature: Auto investment to the current Invoice amount available
             if (investment.getOpportunity().getAvailableBalanceAmount() > 0) {
-                responseJSON = postToFinSmart(investment.getOpportunity().getAvailableBalanceAmount(), investment,
-                        balance, loginJSON);
+                responseJSON = postToFinSmart(investment.getOpportunity().getAvailableBalanceAmount(), investment, loginJSON);
                 actualAmount = investment.getOpportunity().getAvailableBalanceAmount();
                 investment = updateInvestment(investment, responseJSON, 2);
             } else {
@@ -663,12 +668,8 @@ public class FinSmartUtil {
         return investment;
     }
 
-    public static String generateJSONInvest(double amount, String currency, String invoice_id,HashMap<String,Double> balance){
-        //FEATURE TO INVEST WITH AVAILABLE BALANCE
-        if(amount >= balance.get(currency)){
-            return "{\"amount\":\""+df2.format(balance.get(currency))+"\",\"currency\":\""+currency+"\",\"invoice\":\""+invoice_id+
-                    "\",\"type\":\"investment\"}";
-        }else return "{\"amount\":\""+amount+"\",\"currency\":\""+currency+"\",\"invoice\":\""+invoice_id+
+    public static String generateJSONInvest(double amount, String currency, String invoice_id){
+        return "{\"amount\":\""+amount+"\",\"currency\":\""+currency+"\",\"invoice\":\""+invoice_id+
                 "\",\"type\":\"investment\"}";
     }
 
@@ -712,12 +713,40 @@ public class FinSmartUtil {
     public static Map<String, InvoiceTransactions> indexInvoices(List<InvoiceTransactions> invoices){
         Map<String,InvoiceTransactions> invoicesIndex = new HashMap<>();
         for(InvoiceTransactions inv : invoices){
+            if(inv.getActualPaymentDate() != null && inv.getPaymentDate() != null){
+                inv.setPastDueDays(getDuePastDays(inv));
+            }
             invoicesIndex.put(inv.get_id(),inv);
         }
         return invoicesIndex;
     }
 
+    public static long getDuePastDays(InvoiceTransactions inv){
+        long diffInMillis = Math.abs(inv.getActualPaymentDate().getTime() - inv.getPaymentDate().getTime());
+        return TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+    }
+
     public static String getAppUrl(HttpServletRequest request) {
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+    }
+
+    public static Double getExchangeRate(){
+        String url_str = "https://v6.exchangerate-api.com/v6/5576a9d5c2bb2d53ccc6b3b3/pair/USD/PEN";
+
+        URL url;
+        try {
+            url = new URL(url_str);
+            HttpURLConnection request = (HttpURLConnection) url.openConnection();
+            request.connect();
+            JsonParser jp = new JsonParser();
+            JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent()));
+            JsonObject jsonobj = root.getAsJsonObject();
+            return jsonobj.get("conversion_rate").getAsDouble();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

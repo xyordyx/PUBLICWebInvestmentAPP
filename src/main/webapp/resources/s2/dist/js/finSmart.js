@@ -24,54 +24,82 @@ function disconnect() {
 function processData(data) {
     if(data.investmentList.length !== 0){
         for (i = 0; i < data.investmentList.length; i++) {
-            if(data.investmentList[i].status== "false" && data.investmentList[i].uistate == "true"){
-                document.getElementById('status_'+data.investmentList[i].invoiceNumber)
-                    .setAttribute("class", "badge p-2 badge-danger text-white");
-                document.getElementById('status_'+data.investmentList[i].invoiceNumber).innerHTML =
-                    "Investment Failed";
-                document.getElementById('customer_'+data.investmentList[i].invoiceNumber)
-                    .setAttribute("class", "text-danger");
-                document.getElementById('customer_'+data.investmentList[i].invoiceNumber).innerHTML =
-                    data.investmentList[i].message;
-                invDisplay += "Invoice:  <span class=\"text-warning\">"+data.investmentList[i].invoiceNumber
-                    +"</span> Status: <span class=\"text-danger\">"
-                    +data.investmentList[i].status+"</span><br>";
-            }else if(data.investmentList[i].status == "true" && data.investmentList[i].uistate == "true"){
-                document.getElementById('status_'+data.investmentList[i].invoiceNumber)
-                    .setAttribute("class", "badge p-2 badge-success text-white");
-                document.getElementById('status_'+data.investmentList[i].invoiceNumber).innerHTML =
-                    "Investment Successfully";
-                if(data.system == "HMFINSMART"){
-                    document.getElementById('customer_'+data.investmentList[i].invoiceNumber).innerHTML =
-                        "Customer: "+data.investmentList[i].opportunity.debtor.companyName;
-                }else{
-                    document.getElementById('customer_'+data.investmentList[i].invoiceNumber).innerHTML =
-                        "Customer: "+data.investmentList[i].results.debtor.official_name;
-                }
-                if(data.investmentList[i].autoAdjusted == true){
-                    document.getElementById('amount_'+data.investmentList[i].invoiceNumber).innerHTML =
-                        data.investmentList[i].adjustedAmount;
-                    invDisplay += "Invoice: <span class=\"text-warning\">"+data.investmentList[i].invoiceNumber
-                        +"</span> Status: <span class=\"text-success\">Success </span> " +
-                        "- Amount: <span class=\"text-info\"> AUTO adjusted from "+data.investmentList[i].amount+
-                        " to "+data.investmentList[i].adjustedAmount+"</span><br>";
+            if(data.system == "HMFINSMART"){
+                if(data.investmentList[i].status == "cancelled"){
+                    document.getElementById('card_'+data.investmentList[i].invoiceNumber)
+                        .setAttribute("class", "card redial-border-light redial-shadow redial-bg-goog");
+                    document.getElementById('invID_'+data.investmentList[i].invoiceNumber)
+                        .setAttribute("class", "mb-1 redial-font-weight-400 text-primary");
+                    document.getElementById('currency_'+data.investmentList[i].invoiceNumber)
+                        .setAttribute("class", "fact-box"+data.investmentList[i].currency+" text-center text-sm-right text-primary");
+                    document.getElementById('amount_'+data.investmentList[i].invoiceNumber)
+                        .setAttribute("class", "counter_number text-primary");
+
+                    document.getElementById('status_'+data.investmentList[i].invoiceNumber)
+                        .setAttribute("class", "badge p-2 badge-light text-danger");
+                    document.getElementById('status_'+data.investmentList[i].invoiceNumber).innerHTML =
+                        "NOT FOUND - CANCELLED";
                 }else {
-                    invDisplay += "Invoice: <span class=\"text-warning\">" + data.investmentList[i].invoiceNumber
-                        + "</span> Status: <span class=\"text-success\">Success</span><br>";
+                    document.getElementById('customer_' + data.investmentList[i].invoiceNumber).innerHTML =
+                        data.investmentList[i].opportunity.debtor.companyName;
+                    if (data.investmentList[i].status == "inProgress") {
+                        document.getElementById('card_'+data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "card redial-border-light redial-shadow redial-bg-link");
+                        document.getElementById('status_' + data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "badge p-2 badge-success text-white");
+                        document.getElementById('status_' + data.investmentList[i].invoiceNumber).innerHTML =
+                            "In Progress";
+                    }else if (data.investmentList[i].status == "scheduled") {
+                        document.getElementById('card_'+data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "card redial-border-light redial-shadow redial-bg-fb");
+                        document.getElementById('status_' + data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "badge p-2 badge-warning text-white");
+                        document.getElementById('status_' + data.investmentList[i].invoiceNumber).innerHTML =
+                            "Scheduled";
+                    }else if(data.investmentList[i].status == "true"){
+                        document.getElementById('card_'+data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "card redial-border-light redial-shadow bg-success");
+                        document.getElementById('status_' + data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "badge p-2 badge-light text-success");
+                        document.getElementById('customer_' + data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "mb-2 text-warning lead");
+                        if(data.investmentList[i].autoAdjusted == true){
+                            document.getElementById('amount_'+data.investmentList[i].invoiceNumber).innerHTML =
+                                data.investmentList[i].adjustedAmount;
+                            invDisplay += "Invoice: <span class=\"text-warning\">"+data.investmentList[i].invoiceNumber
+                                +"</span> Status: <span class=\"text-success\">Success </span> " +
+                                "- Amount: <span class=\"text-info\"> AUTO adjusted from "+data.investmentList[i].amount+
+                                " to "+data.investmentList[i].adjustedAmount+"</span><br>";
+                            document.getElementById('status_' + data.investmentList[i].invoiceNumber).innerHTML =
+                                "Completed with Amount Adjustment";
+                        }else{
+                            document.getElementById('status_' + data.investmentList[i].invoiceNumber).innerHTML =
+                                "Completed Successfully";
+                        }
+                    }else if(data.investmentList[i].status == "false"){
+                        document.getElementById('card_'+data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "card redial-border-light redial-shadow redial-bg-goog");
+                        document.getElementById('invID_'+data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "mb-1 redial-font-weight-400 text-primary");
+                        document.getElementById('currency_'+data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "fact-box"+data.investmentList[i].currency+" text-center text-sm-right text-primary");
+                        document.getElementById('amount_'+data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "counter_number text-primary");
+                        document.getElementById('customer_' + data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "mb-2 text-primary lead");
+
+                        document.getElementById('status_' + data.investmentList[i].invoiceNumber).style.visibility =
+                            "hidden";
+                        document.getElementById('message_' + data.investmentList[i].invoiceNumber)
+                            .setAttribute("class", "mb-2 text-white lead");
+                        document.getElementById('message_'+data.investmentList[i].invoiceNumber).innerHTML =
+                            data.investmentList[i].message;
+                    }
                 }
-            }else if(data.investmentList[i].status == "inProgress"){
-                document.getElementById('status_'+data.investmentList[i].invoiceNumber)
-                    .setAttribute("class", "badge p-2 badge-info text-white");
-                document.getElementById('status_'+data.investmentList[i].invoiceNumber).innerHTML =
-                    "In Progress";
             }
         }
         if(data.transactionStatus === true){
-            swal({
-                title: "All Investments were processed!",
-                text: invDisplay,
-                html: true
-            });
+            toastr.success('All Investments were processed!');
             document.getElementById("return").style.visibility = "visible";
             document.getElementById("cancelBtn").style.visibility = "hidden";
             disconnect();

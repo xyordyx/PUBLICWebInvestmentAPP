@@ -34,6 +34,16 @@ public class InvoiceTransactions {
     private long pastDueDays;
     @Transient
     private int moraDays;
+    @Transient
+    private Transactions transactions;
+
+    public Transactions getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(Transactions transactions) {
+        this.transactions = transactions;
+    }
 
     public int getMoraDays() {
         return moraDays;

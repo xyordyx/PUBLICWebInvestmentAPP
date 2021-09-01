@@ -70,7 +70,7 @@ public class FacturedoInvestor implements Callable<Investment> {
                                 investment.getStatus() +" - Message: "+
                                 investment.getMessage()+" - "+getTime());
                         queueStr.setActualSize(queueStr.getActualSize()-1);
-                        reportService.updateInvestmentStatus(investment,userId,systemId);
+                        //reportService.updateInvestmentStatus(investment,userId,systemId);
                         return investment;
                     }
                 }
@@ -90,7 +90,7 @@ public class FacturedoInvestor implements Callable<Investment> {
                         " investor stopped after 15 minutes - "+getTime());
                 investment.setStatus("false");
                 investment.setMessage("Invoice could not be found");
-                reportService.updateInvestmentStatus(investment,userId,systemId);
+                //reportService.updateInvestmentStatus(investment,userId,systemId);
                 queueStr.setActualSize(queueStr.getActualSize()-1);
                 return investment;
             }

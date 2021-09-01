@@ -19,8 +19,6 @@ public class InvestmentBlock {
     @Transient
     private String system;
     @Transient
-    private int timeRequest;
-    @Transient
     private boolean sleep;
 
     public boolean isSleep() {
@@ -29,14 +27,6 @@ public class InvestmentBlock {
 
     public void setSleep(boolean sleep) {
         this.sleep = sleep;
-    }
-
-    public int getTimeRequest() {
-        return timeRequest;
-    }
-
-    public void setTimeRequest(int timeRequest) {
-        this.timeRequest = timeRequest;
     }
 
     public String getSystem() {

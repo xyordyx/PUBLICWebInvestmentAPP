@@ -13,8 +13,6 @@ public class InvestmentForm {
     @NotNull @NotEmpty
     private String scheduledTime;
     @NotNull @NotEmpty
-    private String timeRequest;
-    @NotNull @NotEmpty
     private boolean sleep;
 
     public boolean isSleep() {
@@ -23,14 +21,6 @@ public class InvestmentForm {
 
     public void setSleep(boolean sleep) {
         this.sleep = sleep;
-    }
-
-    public String getTimeRequest() {
-        return timeRequest;
-    }
-
-    public void setTimeRequest(String timeRequest) {
-        this.timeRequest = timeRequest;
     }
 
     public String getScheduledTime() {

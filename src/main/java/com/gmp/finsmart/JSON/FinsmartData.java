@@ -50,12 +50,34 @@ public class FinsmartData {
     private Map<String,Transactions> totalProfitIndex;
     @Transient
     private Map<String,Transactions> currentInvestmentsIndex;
+    @Transient
+    private List<InvoiceTransactions> invoiceTransactionsList;
+    @Transient
+    private List<Transactions> lastInvestments;
 
     public FinsmartData() {
         this.depositedIndex = new HashMap<>();
         this.retentionsIndex = new HashMap<>();
         this.totalProfitIndex = new HashMap<>();
         this.currentInvestmentsIndex = new HashMap<>();
+        this.invoiceTransactionsList = new ArrayList<>();
+        this.lastInvestments = new ArrayList<>();
+    }
+
+    public List<Transactions> getLastInvestments() {
+        return lastInvestments;
+    }
+
+    public void setLastInvestments(List<Transactions> lastInvestments) {
+        this.lastInvestments = lastInvestments;
+    }
+
+    public List<InvoiceTransactions> getInvoiceTransactionsList() {
+        return invoiceTransactionsList;
+    }
+
+    public void setInvoiceTransactionsList(List<InvoiceTransactions> invoiceTransactionsList) {
+        this.invoiceTransactionsList = invoiceTransactionsList;
     }
 
     public Map<String, Transactions> getCurrentInvestmentsIndex() {

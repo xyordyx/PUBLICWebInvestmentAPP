@@ -36,13 +36,14 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.gmp.hmviking.InvestmentUtil.*;
-import static com.gmp.hmviking.InvestmentUtil.updateInvestment;
 
 @Controller
 public class HMVikingController {
     private LoginJSON loginJSON;
     private InvestmentBlock investmentBlockInv;
     private ExecutorService pool;
+    private ExecutorService poolInvestor;
+    private ExecutorService poolSubmit;
     private FacturedoUpdater updaterFact;
     @Autowired
     private FactUserRepository factUserRepository;
@@ -57,7 +58,8 @@ public class HMVikingController {
     @Autowired
     private SmartUserRepository smartRepository;
     private HttpSession schedulerSession;
-    private Double currencyFactor = 3.60;
+    private double currencyFactor = FinSmartUtil.getExchangeRate();
+    //private double currencyFactor = 4.10;
     private FinsmartData finsmartData;
     private User userId;
     private Double balancePEN;
@@ -74,16 +76,16 @@ public class HMVikingController {
         schedulerSession = session;
         actualSize = investmentBlockInv.getInvestmentList().size();
         pool = Executors.newFixedThreadPool(actualSize);
+        poolInvestor = Executors.newFixedThreadPool(investmentBlockInv.getInvestmentList().size());
+        poolSubmit = Executors.newFixedThreadPool(investmentBlockInv.getInvestmentList().size());
         queueStructure = new QueueStructure(investmentBlockInv.getInvestmentList().size(),
                 balancePEN, balanceUSD,investmentBlockInv.getSystem(),investmentBlockInv.isScheduled());
         if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
-            FinSmartSeekerThread seeker = new FinSmartSeekerThread(loginJSON,investmentBlockInv.getScheduledTime(),
-                    investmentBlockInv.getTimeRequest(),queueStructure,investmentBlockInv.getInvestmentList(),
-                    reportService,userId,investmentBlockInv.getSystem());
+            FinSmartSeekerParked seeker = new FinSmartSeekerParked(loginJSON,investmentBlockInv,
+                    queueStructure,reportService,userId, poolInvestor, poolSubmit);
             pool.execute(seeker);
         }else if(investmentBlockInv.getSystem().equals("HMFACTUREDO")){
-            FacturedoSeeker seeker = new FacturedoSeeker(queueStructure,loginJSON, investmentBlockInv.getScheduledTime(),
-                    investmentBlockInv.getTimeRequest(),auctMap);
+            FacturedoSeeker seeker = new FacturedoSeeker(queueStructure,loginJSON, investmentBlockInv.getScheduledTime(),auctMap);
             updaterFact = new FacturedoUpdater(seeker, investmentBlockInv.getScheduledTime());
             pool.execute(seeker);
             pool.execute(updaterFact);
@@ -91,54 +93,35 @@ public class HMVikingController {
         session.setAttribute("investmentsList", investmentBlockInv.getInvestmentList());
         enabled.set(true);
         if(device.isMobile()){
-            if(investmentBlockInv.isScheduled()){
-                return "redirect:/publicIndex?schedule=true";
-            }else return "redirect:/publicIndex";
+            return "redirect:/publicIndex";
         }
-        if(investmentBlockInv.isScheduled()){
-            return "redirect:/investPage?schedule=true";
-        }else return "redirect:/investPage";
+        return "redirect:/investPage";
     }
 
     @RequestMapping(value="/cancelTransactions.json",method = RequestMethod.GET)
     public @ResponseBody void cancelTransactions(){
-        this.pool.shutdownNow();
+        Thread.currentThread().interrupt();
+        this.poolInvestor.shutdown();
+        this.poolSubmit.shutdown();
         this.pool.shutdown();
+        this.poolInvestor.shutdownNow();
+        this.pool.shutdownNow();
+        this.poolSubmit.shutdownNow();
     }
 
     @RequestMapping(value="/getDataUX.json",method = RequestMethod.GET)
     public @ResponseBody
     QueueStructure manualSendDataUX(){
         if(enabled.get()){
-            updateInvestment(queueStructure.getInvestmentList());
-            if(actualSize == queueStructure.getInvestmentList().size()){
-                queueStructure.setTransactionStatus(true);
-                enabled.set(false);
-            }
             return queueStructure;
         }
         return null;
     }
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 5000)
     private void sendDataUX() {
         if(enabled.get()){
-            if(investmentBlockInv.getSystem().equals("HMFINSMART")) {
-                if(!flag && !queueStructure.isScheduled()){
-                    investmentBlockInv.setInvestmentList(setInProgress(investmentBlockInv.getInvestmentList()));
-                    flag = true;
-                    simpMessagingTemplate.convertAndSend("/finSmart/investments", investmentBlockInv);
-                }
-            }
-            else if(investmentBlockInv.getSystem().equals("HMFACTUREDO")){
-                if(updaterFact.getQueueStr()!=null && !flag && investmentBlockInv.isScheduled()){
-                    investmentBlockInv.setInvestmentList(setInProgress(investmentBlockInv.getInvestmentList()));
-                    flag = true;
-                    simpMessagingTemplate.convertAndSend("/finSmart/investments", investmentBlockInv);
-                }
-            }
-            updateInvestment(queueStructure.getInvestmentList());
-            if(actualSize == queueStructure.getInvestmentList().size()){
+            if(queueStructure.getActualSize() == 0){
                 queueStructure.setTransactionStatus(true);
                 enabled.set(false);
             }
@@ -170,7 +153,7 @@ public class HMVikingController {
         model.addAttribute("investmentForm", new InvestmentForm());
         FinancialTransactions financialTransactions = FinSmartCIG.getFinancialTransactions(loginJSON.getAccessToken());
         invoices = FinSmartCIG.getInvoices(loginJSON.getAccessToken());
-         finsmartData = reportService.processFinancialTransactions(financialTransactions,invoices,userId);
+        finsmartData = reportService.processFinancialTransactions(financialTransactions,invoices,userId,currencyFactor);
         System.out.println("Financial transactions processed - OK - "+getTime());
 
         balancePEN = finsmartData.getSolesAmountAvailable();
@@ -198,10 +181,10 @@ public class HMVikingController {
         model.addAttribute("totalOnRisk", formatter.format(finsmartData.getSolesOnRisk() +
                 (finsmartData.getDollarOnRisk()*currencyFactor)));
 
-        session.setAttribute("finalizedInv",reportService.getFinalizedInvoices(invoices));
+        session.setAttribute("finalizedInv",finsmartData.getInvoiceTransactionsList());
         session.setAttribute("investments",finsmartData.getCurrentInvestmentsIndex());
-        session.setAttribute("latestInvestments",reportService.getAllByUserAndSystemId(userId,investmentBlockInv.getSystem()));
-
+        session.setAttribute("latestInvestments", finsmartData.getLastInvestments());
+        model.addAttribute("currencyFactor", currencyFactor);
         return "finsmart";
     }
 
@@ -215,9 +198,6 @@ public class HMVikingController {
             return "redirect:/finsmart";
         }
         investmentBlockInv.setInvestmentList(temp);
-        if(!investmentForm.getTimeRequest().equals("")){
-            investmentBlockInv.setTimeRequest((int)(Double.parseDouble(investmentForm.getTimeRequest())*1000));
-        }else investmentBlockInv.setTimeRequest(500);
         if(!investmentForm.getScheduledTime().replace(",","").equals("none")){
             investmentBlockInv.setScheduledTime(investmentForm.getScheduledTime().replace(",",""));
             investmentBlockInv.setScheduled(true);
@@ -266,14 +246,14 @@ public class HMVikingController {
         model.addAttribute("totalProfitUSD", ((balanceUSD+factuData.getDollarCurrentInvested()-factuData.getDollarTotalTransferred())));
         model.addAttribute("totalProfit", formatter.format(
                 (balancePEN+factuData.getSolesCurrentInvested()-factuData.getSolesTotalTransferred()) +
-                ((balanceUSD+factuData.getDollarCurrentInvested()-factuData.getDollarTotalTransferred()))*currencyFactor));
+                        ((balanceUSD+factuData.getDollarCurrentInvested()-factuData.getDollarTotalTransferred()))*currencyFactor));
 
         model.addAttribute("expectedProfitPEN", factuData.getSolesProfitExpected());
         model.addAttribute("expectedProfitUSD", factuData.getDollarProfitExpected());
         model.addAttribute("expectedProfit", formatter.format(factuData.getSolesProfitExpected() +
                 (factuData.getDollarProfitExpected()*currencyFactor)));
 
-        session.setAttribute("latestInvestments",reportService.getAllByUserAndSystemId(userId,investmentBlockInv.getSystem()));
+        //session.setAttribute("latestInvestments",reportService.getAllByUserAndSystemId(userId,investmentBlockInv.getSystem()));
         session.setAttribute("factuInvestments",reportService.getProcessedResultsFactu(factuData,loginJSON).getResultsInProgress());
         session.setAttribute("factuFinalizedInv",reportService.getFactuFinalizedInvoices(loginJSON));
 
@@ -290,9 +270,6 @@ public class HMVikingController {
             return "redirect:/facturedo";
         }
         investmentBlockInv.setInvestmentList(temp);
-        if(!investmentForm.getTimeRequest().equals("")){
-            investmentBlockInv.setTimeRequest((int)(Double.parseDouble(investmentForm.getTimeRequest())*1000));
-        }else investmentBlockInv.setTimeRequest(500);
         if(!investmentForm.getScheduledTime().replace(",","").equals("none")){
             investmentBlockInv.setScheduledTime(investmentForm.getScheduledTime().replace(",",""));
             investmentBlockInv.setScheduled(true);
@@ -312,8 +289,8 @@ public class HMVikingController {
 
     @GetMapping({"/monthlyAnalysis"})
     public String monthlyAnalysis(HttpSession session){
-        session.setAttribute("latestInvestments",reportService.getAllByUserAndSystemId(userId,investmentBlockInv.getSystem()));
-        session.setAttribute("finalizedInv",reportService.getFinalizedInvoices(invoices));
+        session.setAttribute("latestInvestments",finsmartData.getLastInvestments());
+        session.setAttribute("finalizedInv",finsmartData.getInvoiceTransactionsList());
         session.setAttribute("investments",finsmartData.getCurrentInvestmentsIndex());
         return "monthlyAnalysis";
     }

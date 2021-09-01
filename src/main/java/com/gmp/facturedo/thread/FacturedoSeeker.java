@@ -18,19 +18,17 @@ public class FacturedoSeeker extends Thread {
     Instant start = null;
     private LoginJSON loginJSON;
     private String scheduleTime;
-    private int timeRequest;
 
     private int i=0;
 
     private boolean flag;
     private HashMap<Integer, Results> auctionsMap;
 
-    public FacturedoSeeker(QueueStructure queueStr, LoginJSON loginJSON, String scheduleTime, int timeRequest,
+    public FacturedoSeeker(QueueStructure queueStr, LoginJSON loginJSON, String scheduleTime,
                            HashMap<Integer, Results> auctionsMap){
         this.queueStructure = queueStr;
         this.loginJSON = loginJSON;
         this.scheduleTime = scheduleTime;
-        this.timeRequest = timeRequest;
         this.flag = true;
         this.auctionsMap = auctionsMap;
     }
@@ -49,7 +47,6 @@ public class FacturedoSeeker extends Thread {
             }
             this.scheduleTime = null;
         }
-        System.out.println(Thread.currentThread().getName() + ": Seeker - STARTED with timeRequest:"+timeRequest+ " - "+ getTime());
         start = Instant.now();
         while (queueStructure.getActualSize() !=0 && flag) {
             jsonList = null;
@@ -57,7 +54,7 @@ public class FacturedoSeeker extends Thread {
                 Thread threadSeeker = new Thread(seeker);
                 threadSeeker.start();
                 try {
-                    Thread.sleep(this.timeRequest);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     flag = false;
                 }

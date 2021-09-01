@@ -9,7 +9,6 @@ import com.gmp.persistence.dao.HistoricalDataStatusRepository;
 import com.gmp.persistence.dao.LastInvestmentsStatusRepository;
 import com.gmp.persistence.dao.WeeklyDataRepository;
 import com.gmp.persistence.model.*;
-import com.gmp.web.dto.Investment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,43 +41,6 @@ public class ReportService implements IReportService{
 
     Calendar cal = Calendar.getInstance();
     Calendar profitExpected = Calendar.getInstance();
-
-    private final double conversionFactor = 3.60;
-
-    @Override
-    public void updateInvestmentStatus(Investment investment, User userId, String systemId){
-        List<LastInvestmentsStatus> statusList = lastInvestmentsStatusRepository.getLastRecordByUser(userId);
-        if(statusList.size() >= 8){
-            lastInvestmentsStatusRepository.deleteById(statusList.get(0).getId());
-        }
-        LastInvestmentsStatus newRecord = new LastInvestmentsStatus();
-        newRecord.setAmount(investment.getAmount());
-        newRecord.setCurrency(investment.getCurrency());
-        newRecord.setInvoiceNumber(investment.getInvoiceNumber());
-        newRecord.setStatus(investment.getStatus());
-        newRecord.setMessage(investment.getMessage());
-        newRecord.setAdjustedAmount(investment.getAdjustedAmount());
-        newRecord.setAutoAdjusted(investment.isAutoAdjusted());
-        if(systemId.equals("HMFINSMART")) {
-            newRecord.setRazonSocial(investment.getOpportunity().getDebtor().getCompanyName());
-        }else if(systemId.equals("HMFACTUREDO")) {
-            newRecord.setRazonSocial(investment.getResults().getDebtor().getOfficial_name());
-        }
-        newRecord.setSystemId(systemId);
-        newRecord.setDateTime(ZonedDateTime.now(ZoneId.of("GMT-5")));
-        newRecord.setUser(userId);
-        lastInvestmentsStatusRepository.save(newRecord);
-    }
-
-    @Override
-    public List<LastInvestmentsStatus> getLastInvestmentsStatus(User user) {
-        return lastInvestmentsStatusRepository.getAllByUser(user);
-    }
-
-    @Override
-    public List<LastInvestmentsStatus> getAllByUserAndSystemId(User user, String systemId){
-        return lastInvestmentsStatusRepository.getAllByUserAndSystemId(user, systemId);
-    }
 
     @Override
     public List<HistoricalData> getMonthlyAnalysis(User user){
@@ -127,7 +89,8 @@ public class ReportService implements IReportService{
 
     @Override
     public FinsmartData processFinancialTransactions(FinancialTransactions transactions,
-                                                            List<InvoiceTransactions> invoices, User userId) {
+                                                            List<InvoiceTransactions> invoices, User userId,
+                                                     double currencyFactor) {
         restoreHistoricData(userId);
         HistoricalDataStatus dataStatus = statusRepository.getLastRecordByUserByType(userId,"data");
         Map<String,InvoiceTransactions> invoicesIndexed = FinSmartUtil.indexInvoices(invoices);
@@ -163,15 +126,26 @@ public class ReportService implements IReportService{
                     sum = smartData.getDollarTotalProfit() + financialTransactions.getAmount();
                     smartData.setDollarTotalProfit(sum);
                 }
-                saveMonthlyProfitData(financialTransactions,dataStatus,userId);
+                saveMonthlyProfitData(financialTransactions,dataStatus,userId,currencyFactor);
                 smartData.getTotalProfitIndex().put(financialTransactions.getInvoice().get_id(),financialTransactions);
-                //TOTAL CURRENT INVESTED
+                //COMPLETED INVESTMENTS
+            }else if(financialTransactions.getType().equals("investment") && financialTransactions.getStatus().equals("capital refunded")){
+                if(invoicesIndexed.containsKey(financialTransactions.getInvoice().get_id())) {
+                    InvoiceTransactions currentTransact =
+                            invoicesIndexed.get(financialTransactions.getInvoice().get_id());
+                    currentTransact.setTransactions(financialTransactions);
+                    smartData.getInvoiceTransactionsList().add(currentTransact);
+                }
             }
+            //TOTAL CURRENT INVESTED
             else if (financialTransactions.getType().equals("investment") && financialTransactions.getStatus().equals("in progress")) {
                 if(invoicesIndexed.containsKey(financialTransactions.getInvoice().get_id())) {
                     InvoiceTransactions currentTransact = invoicesIndexed.get(financialTransactions.getInvoice().get_id());
                     double tempProfit = FinSmartUtil.calculateROI(currentTransact.getTem(),
                             currentTransact.getMinimumDuration(), financialTransactions.getAmount());
+                    if(smartData.getLastInvestments().isEmpty() || smartData.getLastInvestments().size() < 8){
+                        smartData.getLastInvestments().add(financialTransactions);
+                    }
                     //21 DAYS TO INCLUDE INTO RISK
                     if(currentTransact.getToBeCollectedIn().equals("En mora") && currentTransact.getMoraDays() > 21) {
                         tempOnRisk = financialTransactions.getAmount();
@@ -195,15 +169,15 @@ public class ReportService implements IReportService{
                     financialTransactions.setInvoiceAppend(invoicesIndexed.get(financialTransactions.getInvoice().get_id()));
                     smartData.getCurrentInvestmentsIndex().put(financialTransactions.getInvoice().get_id(), financialTransactions);
                 }
-                saveMonthlyProfitExpectedData(financialTransactions,dataStatus,userId);
-                saveMonthlyInvestedData(financialTransactions,dataStatus,userId);
+                saveMonthlyProfitExpectedData(financialTransactions,dataStatus,userId, currencyFactor);
+                saveMonthlyInvestedData(financialTransactions,dataStatus,userId, currencyFactor);
             }if(financialTransactions.getStatus().equals("investment start")){
                 if (financialTransactions.getCurrency().equals("pen")) {
                     smartData.setSolesCurrentInvested(smartData.getSolesCurrentInvested() + financialTransactions.getAmount());
                 } else {
                     smartData.setDollarCurrentInvested(smartData.getDollarCurrentInvested() + financialTransactions.getAmount());
                 }
-                saveMonthlyInvestedData(financialTransactions,dataStatus,userId);
+                saveMonthlyInvestedData(financialTransactions,dataStatus,userId, currencyFactor);
             }
         }
         if(dataStatus == null){dataStatus = new HistoricalDataStatus(); }
@@ -223,7 +197,8 @@ public class ReportService implements IReportService{
         return smartData;
     }
 
-    public boolean saveMonthlyProfitData(Transactions financialTransactions, HistoricalDataStatus dataStatus, User userId){
+    public boolean saveMonthlyProfitData(Transactions financialTransactions, HistoricalDataStatus dataStatus, User userId,
+                                         double conversionFactor){
         if(dataStatus != null){
             Instant instant = dataStatus.getLastUpdate().toInstant();
             Date date = Date.from(instant);
@@ -254,7 +229,8 @@ public class ReportService implements IReportService{
         return true;
     }
 
-    public boolean saveMonthlyInvestedData(Transactions financialTransactions, HistoricalDataStatus dataStatus, User userId){
+    public boolean saveMonthlyInvestedData(Transactions financialTransactions, HistoricalDataStatus dataStatus, User userId,
+                                           double conversionFactor){
         if(dataStatus != null){
             Instant instant = dataStatus.getLastUpdate().toInstant();
             Date date = Date.from(instant);
@@ -288,7 +264,8 @@ public class ReportService implements IReportService{
         return true;
     }
 
-    public boolean saveMonthlyProfitExpectedData(Transactions financialTransactions, HistoricalDataStatus dataStatus, User userId){
+    public boolean saveMonthlyProfitExpectedData(Transactions financialTransactions, HistoricalDataStatus dataStatus, User userId,
+                                                 double conversionFactor){
         if(dataStatus != null){
             Instant instant = dataStatus.getLastUpdate().toInstant();
             Date date = Date.from(instant);
@@ -370,18 +347,6 @@ public class ReportService implements IReportService{
     }
 
     @Override
-    public List<InvoiceTransactions> getFinalizedInvoices(List<InvoiceTransactions> invoices) {
-        List<InvoiceTransactions> finalized = new ArrayList<>();
-        for(InvoiceTransactions inv : invoices){
-            if(inv.getStatus().equals("finalized")){
-                inv.setPastDueDays(getDuePastDays(inv));
-                finalized.add(inv);
-            }
-        }
-        return finalized;
-    }
-
-    @Override
     public Auctions getFactuFinalizedInvoices(LoginJSON loginJSON){
         Auctions act = getCompletedInvestJSON(loginJSON);
         for(Results results : act.getResults()){
@@ -390,10 +355,6 @@ public class ReportService implements IReportService{
         return act;
     }
 
-    public long getDuePastDays(InvoiceTransactions inv){
-        long diffInMillis = Math.abs(inv.getActualPaymentDate().getTime() - inv.getPaymentDate().getTime());
-        return TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
-    }
 
     @Override
     public FacturedoData getProcessedResultsFactu(FacturedoData factuData,LoginJSON loginJSON){

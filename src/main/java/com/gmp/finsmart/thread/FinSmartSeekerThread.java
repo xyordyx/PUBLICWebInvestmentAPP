@@ -57,7 +57,6 @@ public class FinSmartSeekerThread extends Thread {
             System.out.println(Thread.currentThread().getName() + ":Seeker - scheduled - " + getTime());
             try {
                 Thread.sleep(timesDiff(scheduleTime));
-                this.scheduleTime = null;
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName() + ": Seeker - was awakened - " + getTime());
                 flag = false;
@@ -98,13 +97,5 @@ public class FinSmartSeekerThread extends Thread {
             i++;
         }
         System.out.println(Thread.currentThread().getName()+": Seeker - OP seeker stopped - " + getTime());
-    }
-
-    public QueueStructure getStatus(){
-        return this.queueStructure;
-    }
-
-    public List<Opportunities> getJsonList() {
-        return jsonList;
     }
 }

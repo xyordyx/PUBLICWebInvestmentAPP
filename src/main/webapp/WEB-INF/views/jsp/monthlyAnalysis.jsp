@@ -137,7 +137,7 @@
 </a>
 <!-- End Top To Bottom-->
 
-
+<!--SIDE BAR START-->
 <!-- Actual investments -->
 <div class="modal fade" id="actualInvestments" tabindex="-1" role="dialog" aria-labelledby="actualInvestments" aria-hidden="true">
     <div class="modal-dialog  modal-lg" role="document">
@@ -182,10 +182,10 @@
                                             <tr>
                                                 <c:choose>
                                                     <c:when test="${invest.value.invoiceAppend.toBeCollectedIn == 'En mora'}">
-                                                        <td class="bg-danger text-white">${invest.value.invoiceAppend.debtor.companyName} - ${invest.value.invoiceAppend.debtor.companyRuc}</td>
+                                                        <td class="bg-danger text-white">${invest.value.invoice.debtor.companyName} - ${invest.value.invoice.debtor.companyRuc}</td>
                                                         <td class="bg-danger text-white"><fmt:formatDate value="${invest.value.invoiceAppend.paymentDate}" pattern="dd-MM-yyyy" /></td>
                                                         <td class="bg-danger text-white"><fmt:formatDate value="${invest.value.invoiceAppend.createdAt}" pattern="dd-MM-yyyy" /></td>
-                                                        <td class="bg-danger text-white">0</td>
+                                                        <td class="bg-danger text-white">-${invest.value.invoiceAppend.moraDays}</td>
                                                         <c:choose>
                                                             <c:when test="${invest.value.currency == 'pen'}">
                                                                 <td class="bg-danger text-white">PEN ${invest.value.amount}</td>
@@ -198,7 +198,7 @@
                                                         <td class="bg-danger text-white">${invest.value.invoiceAppend.tea} /<br>${invest.value.invoiceAppend.tem}</td>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <td>${invest.value.invoiceAppend.debtor.companyName} - ${invest.value.invoiceAppend.debtor.companyRuc}</td>
+                                                        <td>${invest.value.invoice.debtor.companyName} - ${invest.value.invoice.debtor.companyRuc}</td>
                                                         <td><fmt:formatDate value="${invest.value.invoiceAppend.paymentDate}" pattern="dd-MM-yyyy" /></td>
                                                         <td><fmt:formatDate value="${invest.value.invoiceAppend.createdAt}" pattern="dd-MM-yyyy" /></td>
                                                         <td>${invest.value.invoiceAppend.toBeCollectedIn}</td>
@@ -253,32 +253,35 @@
                                         <thead>
                                         <tr class="redial-bg-secondry-light text-white">
                                             <th scope="col">Company</th>
+                                            <th scope="col">Investment Date</th>
                                             <th scope="col">Fixed P. Date</th>
                                             <th scope="col">Actual P. Date</th>
-                                            <th scope="col">Past Due Days</th>
-                                            <th scope="col">Investment Date</th>
+                                            <th scope="col">Due Days</th>
                                             <th scope="col">Tem</th>
+                                            <th scope="col">Amount</th>
                                         </tr>
                                         </thead>
                                         <tfoot>
                                         <tr class="redial-bg-secondry-light text-white">
                                             <th scope="col">Company</th>
+                                            <th scope="col">Investment Date</th>
                                             <th scope="col">Fixed P. Date</th>
                                             <th scope="col">Actual P. Date</th>
-                                            <th scope="col">Past Due Days</th>
-                                            <th scope="col">Investment Date</th>
+                                            <th scope="col">Due Days</th>
                                             <th scope="col">Tem</th>
+                                            <th scope="col">Amount</th>
                                         </tr>
                                         </tfoot>
                                         <tbody>
                                         <c:forEach var="invest" items="${finalizedInv}">
                                             <tr>
-                                                <td>${invest.debtor.companyName} - ${invest.debtor.companyRuc}</td>
+                                                <td>${invest.transactions.invoice.debtor.companyName} - ${invest.transactions.invoice.debtor.companyRuc}</td>
+                                                <td><fmt:formatDate value="${invest.createdAt}" pattern="dd-MM-yyyy" /></td>
                                                 <td><fmt:formatDate value="${invest.paymentDate}" pattern="dd-MM-yyyy" /></td>
                                                 <td><fmt:formatDate value="${invest.actualPaymentDate}" pattern="dd-MM-yyyy" /></td>
                                                 <td>${invest.pastDueDays}</td>
-                                                <td><fmt:formatDate value="${invest.createdAt}" pattern="dd-MM-yyyy" /></td>
                                                 <td>${invest.tem}</td>
+                                                <td>${invest.transactions.amount} ${invest.currency}</td>
                                             </tr>
                                         </c:forEach>
                                         </tbody>
@@ -297,6 +300,7 @@
 </div>
 <!-- End finalized investments -->
 
+
 <!-- Latest Investments MODAL -->
 <div class="modal fade" id="latestInv" tabindex="-1" role="dialog" aria-labelledby="latestInv" aria-hidden="true">
     <div class="modal-dialog  modal-lg" role="document">
@@ -313,54 +317,21 @@
                         <div class="card redial-border-light redial-shadow">
                             <div class="card-body">
                                 <h7 class="mb-1 redial-font-weight-400 text-p">Invoice ID </h7>
-                                <span class="badge badge-primary text-success pull-right">${latestInv.dateTime}</span>
-                                <h5 class="mb-2 text-warning">${latestInv.invoiceNumber}</h5>
+                                <span class="badge badge-primary text-success pull-right"><fmt:formatDate value="${latestInv.createdAt}" pattern="dd-MM-yyyy" /></span>
+                                <h5 class="mb-2 text-warning">${latestInv.invoice.physicalInvoices[0].code}</h5>
                                 <div class="media-body">
                                     <div class="fact-box${latestInv.currency} text-center text-sm-right">
-                                        <h2 id="amount_${latestInv.invoiceNumber}" class="counter_number text-white">
+                                        <h2 id="amount_${latestInv.invoice.physicalInvoices[0].code}" class="counter_number text-white">
                                                 ${latestInv.amount}
                                         </h2>
                                     </div>
-                                    <c:if test="${latestInv.status == true}">
-                                        <c:choose>
-                                            <c:when test="${latestInv.autoAdjusted == true}">
-                                                <div class="text-success">
-                                                    <p id="status_${latestInv.invoiceNumber}" class="mb-2">Investment Successfully!</p>
-                                                </div>
-                                                <div class="text-success">
-                                                    <p id="customer_${latestInv.invoiceNumber}" class="mb-2">
-                                                            ${latestInv.razonSocial}
-                                                    </p>
-                                                </div>
-                                                <div class="text-info">
-                                                    <p id="message_${latestInv.invoiceNumber}" class="mb-2">
-                                                        Amount: was AUTO adjusted from ${latestInv.currency} ${latestInv.amount} to
-                                                            ${latestInv.currency} ${latestInv.adjustedAmount}
-                                                    </p>
-                                                </div>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <div class="text-success">
-                                                    <p id="status_${latestInv.invoiceNumber}" class="mb-2">Investment Successfully!</p>
-                                                </div>
-                                                <div class="text-success">
-                                                    <p id="customer_${latestInv.invoiceNumber}" class="mb-2">
-                                                            ${latestInv.razonSocial}
-                                                    </p>
-                                                </div>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:if>
-                                    <c:if test="${latestInv.status == false}">
-                                        <div class="text-danger">
-                                            <p id="status_${latestInv.invoiceNumber}" class="mb-2">Error</p>
-                                        </div>
-                                        <div class="text-danger">
-                                            <p id="message_${latestInv.invoiceNumber}" class="mb-2">
-                                                    ${latestInv.message}
-                                            </p>
-                                        </div>
-                                    </c:if>
+                                    <div class="text-success">
+                                        <p id="customer_${latestInv.invoice.physicalInvoices[0].code}" class="mb-2">
+                                            <c:set var="str1" value="${latestInv.invoice.debtor.companyName}"/>
+                                            <c:set var = "str2" value = "${fn:substring(str1, 0, 35)}" />
+                                                ${str2}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -374,7 +345,7 @@
     </div>
 </div>
 <!--End Latest Investments MODAL -->
-
+<!--SIDE BAR END-->
 
 
 

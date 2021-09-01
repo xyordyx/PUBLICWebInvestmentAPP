@@ -104,7 +104,7 @@ public class FinSmartCIG{
 
     public static ResponseJSON executeInvestment2(String urlParameters, String token) {
         ResponseJSON responseJSON = null;
-        Response response = null;
+        Response response;
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(20, TimeUnit.SECONDS)
                 //.callTimeout(3000,TimeUnit.MILLISECONDS)
@@ -324,7 +324,7 @@ public class FinSmartCIG{
             url = new URL(smartURLv1+opportunitiesPath);
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod("GET");
-            con.setConnectTimeout(250);
+            con.setConnectTimeout(1000);
             //con.setReadTimeout(250);
             con.setRequestProperty("Content-Type", "application/json");
             con.setRequestProperty("Accept", "application/json");

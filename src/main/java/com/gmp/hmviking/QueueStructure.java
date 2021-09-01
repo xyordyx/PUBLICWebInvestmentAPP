@@ -7,7 +7,6 @@ import java.util.*;
 
 public class QueueStructure {
     private int actualSize;
-    private HashMap<String,Double> balance;
     private volatile List<Investment> investmentList;
     @Transient
     private boolean transactionStatus;
@@ -19,9 +18,6 @@ public class QueueStructure {
     public QueueStructure(int actualSize, double availableSoles, double availableDollar, String system,
                           boolean scheduled) {
         this.actualSize = actualSize;
-        this.balance = new HashMap<>();
-        this.balance.put("pen",availableSoles);
-        this.balance.put("usd",availableDollar);
         this.investmentList = new ArrayList<>();
         this.system = system;
         this.isScheduled = scheduled;
@@ -57,14 +53,6 @@ public class QueueStructure {
 
     public void setTransactionStatus(boolean transactionStatus) {
         this.transactionStatus = transactionStatus;
-    }
-
-    public HashMap<String, Double> getBalance() {
-        return balance;
-    }
-
-    public void setBalance(HashMap<String, Double> balance) {
-        this.balance = balance;
     }
 
     public int getActualSize() {

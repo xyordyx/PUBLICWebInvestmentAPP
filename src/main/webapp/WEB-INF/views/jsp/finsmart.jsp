@@ -3,6 +3,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,6 +43,8 @@
                 </div>
             </div>
             <div class="col-12 col-lg-3 align-self-center d-none d-lg-inline-block">
+                <br>
+                <p class="text-warning">PEN to USD <code>${currencyFactor}</code><p>
             </div>
             <security:authorize access="isAuthenticated()">
                 <form id="logoutForm" method="POST" action="${contextPath}/logout">
@@ -189,12 +192,12 @@
                                         <label for="now" class="redial-dark mb-0">Now!</label>
                                     </div>
                                     <div class="form-group form-check form-check-inline">
-                                        <input onclick="check(this);" class="radioCheck" value="12:25" name="scheduledTime" type="checkbox" id="12">
-                                        <label for="12" class="redial-dark mb-0">12:25</label>
+                                        <input onclick="check(this);" class="radioCheck" value="12:30" name="scheduledTime" type="checkbox" id="12">
+                                        <label for="12" class="redial-dark mb-0">12:30</label>
                                     </div>
                                     <div class="form-group form-check form-check-inline">
-                                        <input onclick="check(this);" class="radioCheck" value="17:25" name="scheduledTime" type="checkbox" id="17">
-                                        <label for="17" class="redial-dark mb-0">17:25</label>
+                                        <input onclick="check(this);" class="radioCheck" value="17:30" name="scheduledTime" type="checkbox" id="17">
+                                        <label for="17" class="redial-dark mb-0">17:30</label>
                                     </div>
                                     <div class="form-group form-check form-check-inline">
                                         <input onclick="check(this);" class="radioCheck" value="" type="checkbox" id="custom">
@@ -208,12 +211,12 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group form-check form-check-inline">
+                                    <!--<div class="form-group form-check form-check-inline">
                                         <div class="input-group form-group">
                                             <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
                                             <input type="text" data-masked="" name="timeRequest" data-inputmask="'mask': '9.99'" id="timeRequest" placeholder="Time Request" class="form-control">
                                         </div>
-                                    </div>
+                                    </div>-->
                                     <button type="submit" class="btn btn-block p-2 btn-outline-success shadowed"><i class="fa fa-bolt pr-2"></i>Invest!</button>
                                 </form>
                             </div>
@@ -221,7 +224,6 @@
                     </div>
                 </div>
                 <!--END INVESMENT FORM-->
-
                 <!-- DASHBOARD KPIs-->
                 <div class="row mb-xl-4 mb-0 justify-content-center  ">
                     <div class="col-12 col-sm-6 col-xl-3 mb-4 mb-xl-0">
@@ -416,6 +418,7 @@
 </a>
     <!-- End Top To Bottom-->
 
+    <!--SIDE BAR START-->
     <!-- Actual investments -->
     <div class="modal fade" id="actualInvestments" tabindex="-1" role="dialog" aria-labelledby="actualInvestments" aria-hidden="true">
         <div class="modal-dialog  modal-lg" role="document">
@@ -460,7 +463,7 @@
                                                 <tr>
                                                     <c:choose>
                                                         <c:when test="${invest.value.invoiceAppend.toBeCollectedIn == 'En mora'}">
-                                                            <td class="bg-danger text-white">${invest.value.invoiceAppend.debtor.companyName} - ${invest.value.invoiceAppend.debtor.companyRuc}</td>
+                                                            <td class="bg-danger text-white">${invest.value.invoice.debtor.companyName} - ${invest.value.invoice.debtor.companyRuc}</td>
                                                             <td class="bg-danger text-white"><fmt:formatDate value="${invest.value.invoiceAppend.paymentDate}" pattern="dd-MM-yyyy" /></td>
                                                             <td class="bg-danger text-white"><fmt:formatDate value="${invest.value.invoiceAppend.createdAt}" pattern="dd-MM-yyyy" /></td>
                                                             <td class="bg-danger text-white">-${invest.value.invoiceAppend.moraDays}</td>
@@ -476,7 +479,7 @@
                                                             <td class="bg-danger text-white">${invest.value.invoiceAppend.tea} /<br>${invest.value.invoiceAppend.tem}</td>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <td>${invest.value.invoiceAppend.debtor.companyName} - ${invest.value.invoiceAppend.debtor.companyRuc}</td>
+                                                            <td>${invest.value.invoice.debtor.companyName} - ${invest.value.invoice.debtor.companyRuc}</td>
                                                             <td><fmt:formatDate value="${invest.value.invoiceAppend.paymentDate}" pattern="dd-MM-yyyy" /></td>
                                                             <td><fmt:formatDate value="${invest.value.invoiceAppend.createdAt}" pattern="dd-MM-yyyy" /></td>
                                                             <td>${invest.value.invoiceAppend.toBeCollectedIn}</td>
@@ -531,32 +534,35 @@
                                             <thead>
                                             <tr class="redial-bg-secondry-light text-white">
                                                 <th scope="col">Company</th>
+                                                <th scope="col">Investment Date</th>
                                                 <th scope="col">Fixed P. Date</th>
                                                 <th scope="col">Actual P. Date</th>
-                                                <th scope="col">Past Due Days</th>
-                                                <th scope="col">Investment Date</th>
+                                                <th scope="col">Due Days</th>
                                                 <th scope="col">Tem</th>
+                                                <th scope="col">Amount</th>
                                             </tr>
                                             </thead>
                                             <tfoot>
                                             <tr class="redial-bg-secondry-light text-white">
                                                 <th scope="col">Company</th>
+                                                <th scope="col">Investment Date</th>
                                                 <th scope="col">Fixed P. Date</th>
                                                 <th scope="col">Actual P. Date</th>
-                                                <th scope="col">Past Due Days</th>
-                                                <th scope="col">Investment Date</th>
+                                                <th scope="col">Due Days</th>
                                                 <th scope="col">Tem</th>
+                                                <th scope="col">Amount</th>
                                             </tr>
                                             </tfoot>
                                             <tbody>
                                             <c:forEach var="invest" items="${finalizedInv}">
                                                 <tr>
-                                                    <td>${invest.debtor.companyName} - ${invest.debtor.companyRuc}</td>
+                                                    <td>${invest.transactions.invoice.debtor.companyName} - ${invest.transactions.invoice.debtor.companyRuc}</td>
+                                                    <td><fmt:formatDate value="${invest.createdAt}" pattern="dd-MM-yyyy" /></td>
                                                     <td><fmt:formatDate value="${invest.paymentDate}" pattern="dd-MM-yyyy" /></td>
                                                     <td><fmt:formatDate value="${invest.actualPaymentDate}" pattern="dd-MM-yyyy" /></td>
                                                     <td>${invest.pastDueDays}</td>
-                                                    <td><fmt:formatDate value="${invest.createdAt}" pattern="dd-MM-yyyy" /></td>
                                                     <td>${invest.tem}</td>
+                                                    <td>${invest.transactions.amount} ${invest.currency}</td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
@@ -592,54 +598,21 @@
                             <div class="card redial-border-light redial-shadow">
                                 <div class="card-body">
                                     <h7 class="mb-1 redial-font-weight-400 text-p">Invoice ID </h7>
-                                    <span class="badge badge-primary text-success pull-right">${latestInv.dateTime}</span>
-                                    <h5 class="mb-2 text-warning">${latestInv.invoiceNumber}</h5>
+                                    <span class="badge badge-primary text-success pull-right"><fmt:formatDate value="${latestInv.createdAt}" pattern="dd-MM-yyyy" /></span>
+                                    <h5 class="mb-2 text-warning">${latestInv.invoice.physicalInvoices[0].code}</h5>
                                     <div class="media-body">
                                         <div class="fact-box${latestInv.currency} text-center text-sm-right">
-                                            <h2 id="amount_${latestInv.invoiceNumber}" class="counter_number text-white">
+                                            <h2 id="amount_${latestInv.invoice.physicalInvoices[0].code}" class="counter_number text-white">
                                                     ${latestInv.amount}
                                             </h2>
                                         </div>
-                                        <c:if test="${latestInv.status == true}">
-                                            <c:choose>
-                                                <c:when test="${latestInv.autoAdjusted == true}">
-                                                <span id="status_${latestInv.invoiceNumber}"
-                                                      class="badge p-2 badge-success text-white">Investment Successfully
-                                                </span>
-                                                    <div class="text-success">
-                                                        <p id="customer_${latestInv.invoiceNumber}" class="mb-2">
-                                                                ${latestInv.razonSocial}
-                                                        </p>
-                                                    </div>
-                                                    <div class="text-info">
-                                                        <p id="message_${latestInv.invoiceNumber}" class="mb-2">
-                                                            Amount: was AUTO adjusted from ${latestInv.currency} ${latestInv.amount} to
-                                                                ${latestInv.currency} ${latestInv.adjustedAmount}
-                                                        </p>
-                                                    </div>
-                                                </c:when>
-                                                <c:otherwise>
-                                                <span id="status_${latestInv.invoiceNumber}"
-                                                      class="badge p-2 badge-success text-white">Investment Successfully
-                                                </span>
-                                                    <div class="text-success">
-                                                        <p id="customer_${latestInv.invoiceNumber}" class="mb-2">
-                                                                ${latestInv.razonSocial}
-                                                        </p>
-                                                    </div>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </c:if>
-                                        <c:if test="${latestInv.status == false}">
-                                        <span id="status_${latestInv.invoiceNumber}"
-                                              class="badge p-2 badge-danger text-white">Error
-                                        </span>
-                                            <div class="text-danger">
-                                                <p id="message_${latestInv.invoiceNumber}" class="mb-2">
-                                                        ${latestInv.message}
-                                                </p>
-                                            </div>
-                                        </c:if>
+                                        <div class="text-success">
+                                            <p id="customer_${latestInv.invoice.physicalInvoices[0].code}" class="mb-2">
+                                                <c:set var="str1" value="${latestInv.invoice.debtor.companyName}"/>
+                                                <c:set var = "str2" value = "${fn:substring(str1, 0, 35)}" />
+                                            ${str2}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -653,6 +626,8 @@
         </div>
     </div>
     <!--End Latest Investments MODAL -->
+    <!--SIDE BAR END-->
+
     <!--ROI Calculator-->
     <div class="l_c_h ">
         <div class="c_h">
@@ -661,7 +636,7 @@
                     <a href="#" class="mini text-danger" style="font-size:23px;">+</a>
                 </div>
                 <div class="left center_icons"><!--center_icons-->
-                     Extra Tools
+                    Extra Tools
                 </div><!--end center_icons-->
             </div>
             <div class="clear"></div>

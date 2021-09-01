@@ -14,19 +14,12 @@ import com.gmp.web.dto.Investment;
 import java.util.List;
 
 public interface IReportService {
-    void updateInvestmentStatus(Investment investment, User userId, String systemId);
-    List<LastInvestmentsStatus> getLastInvestmentsStatus(User userId);
-
     FinsmartData processFinancialTransactions(FinancialTransactions transactions,
-                                              List<InvoiceTransactions> invoices, User userId);
+                                              List<InvoiceTransactions> invoices, User userId, double currencyFactor);
 
     List<HistoricalData> getMonthlyAnalysis(User user);
 
     List<WeeklyDataModel> getDataModel(User user);
-
-    List<InvoiceTransactions> getFinalizedInvoices(List<InvoiceTransactions> invoices);
-
-    List<LastInvestmentsStatus> getAllByUserAndSystemId(User user, String systemId);
 
     FacturedoData getProcessedResultsFactu(FacturedoData factuData,LoginJSON loginJSON);
 

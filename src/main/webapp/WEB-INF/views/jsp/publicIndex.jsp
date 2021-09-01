@@ -44,35 +44,23 @@
                 <div class="row justify-content-center">
                     <c:forEach var="invList" items="${investmentsList}">
                         <div class="col-12 col-sm-5 col-xl-3 mb-7 mb-xl-3 py-2">
-                            <div class="card redial-border-light redial-shadow">
+                            <div id="card_${invList.invoiceNumber}" class="card redial-border-light redial-shadow">
                                 <div class="card-body">
-                                    <h7 class="mb-1 redial-font-weight-400 text-p">Invoice ID </h7>
-                                    <h5 class="mb-2 text-warning">${invList.invoiceNumber}</h5>
+                                    <h7 class="mb-1 redial-font-weight-400 text-primary">Invoice ID </h7>
+                                    <h6 id="invID_${invList.invoiceNumber}" class="mb-2 text-light ">${invList.invoiceNumber}</h6>
+                                    <div>
+                                        <h6 id="customer_${invList.invoiceNumber}" class="mb-2 text-warning lead"></h6>
+                                    </div>
                                     <div class="media-body">
-                                        <div class="fact-box${invList.currency} text-center text-sm-right">
+                                        <div id="currency_${invList.invoiceNumber}"
+                                             class="fact-box${invList.currency} text-center text-sm-right">
                                             <h2 id="amount_${invList.invoiceNumber}" class="counter_number text-white">
                                                     ${invList.amount}
                                             </h2>
-                                            <%
-                                                if ("true".equals(request.getParameter("schedule"))) {
-                                            %>
-                                            <span id="status_${invList.invoiceNumber}"
-                                                  class="badge p-2 badge-warning text-white"> Scheduled </span>
-                                            <%
-                                            }
-                                            else {
-                                            %>
-                                            <span id="status_${invList.invoiceNumber}"
-                                                  class="badge p-2 badge-info text-white"> In Progress </span>
-                                            <%
-                                                }
-                                            %>
+                                            <span id="status_${invList.invoiceNumber}" class="badge p-2"></span>
                                         </div>
-                                        <div class="text-danger">
+                                        <div>
                                             <p id="message_${invList.invoiceNumber}" class="mb-2"></p>
-                                        </div>
-                                        <div class="text-success">
-                                            <p id="customer_${invList.invoiceNumber}" class="mb-2"></p>
                                         </div>
                                     </div>
                                 </div>
