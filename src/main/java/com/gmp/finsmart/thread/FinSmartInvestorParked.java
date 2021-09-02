@@ -39,7 +39,7 @@ public class FinSmartInvestorParked extends Thread {
         if(this.scheduleTime != null) {
             System.out.println(Thread.currentThread().getName() + ":Investor - scheduled - " + getTime());
             try {
-                TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime)-900);
+                TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime)+1000);
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName() + ":Investor - was awakened - " + getTime());
                 flag = false;
@@ -75,7 +75,7 @@ public class FinSmartInvestorParked extends Thread {
             while(responseJSON.getMessage().replace('"',' ').equals(notPublished) &&
                     !Thread.currentThread().isInterrupted()){
                 try {
-                    Thread.sleep(300);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     System.out.println(Thread.currentThread().getName()+"Submit:"+getTime()+investment.getInvoiceNumber()+ " - Stopped");
                 }
