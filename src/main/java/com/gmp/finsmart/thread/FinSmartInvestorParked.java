@@ -39,7 +39,7 @@ public class FinSmartInvestorParked extends Thread {
         if(this.scheduleTime != null) {
             System.out.println(Thread.currentThread().getName() + ":Investor - scheduled - " + getTime());
             try {
-                TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime)+400);
+                TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime));
             } catch (InterruptedException e) {
                 System.out.println(Thread.currentThread().getName() + ":Investor - was awakened - " + getTime());
                 flag = false;
