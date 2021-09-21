@@ -658,11 +658,11 @@
                     </div>
                     <div class="form-group">
                         <label class="redial-font-weight-600 bg-light">Pay Off Date</label>
-                        <input id="payOffDate" type="text" class="form-control text-capitalize bg-secondary text-info" placeholder="Pay Off" readonly disabled/>
+                        <input id="payOffDate" type="text" class="form-control text-capitalize bg-secondary text-dark" placeholder="Pay Off" readonly disabled/>
                     </div>
                     <div class="form-group">
                         <label class="redial-font-weight-600">ROI</label>
-                        <input id="roi" type="text" class="form-control text-capitalize bg-secondary text-info" placeholder="ROI" readonly disabled/>
+                        <input id="roi" type="text" class="form-control text-capitalize bg-secondary text-dark" placeholder="ROI" readonly disabled/>
                     </div>
                 </form>
             </div>
