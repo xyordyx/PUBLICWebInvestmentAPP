@@ -60,8 +60,7 @@ public class FinSmartSeekerParked extends Thread {
         List<Opportunities> opportunities = FinSmartCIG.getOpportunitiesJSON(loginJSON.getAccessToken());
         while(opportunities == null) opportunities = FinSmartCIG.getOpportunitiesJSON(loginJSON.getAccessToken());
         List<Investment> currentInvests = FinSmartUtilParked.checkForParked(Thread.currentThread().getName(),
-                opportunities,
-                investmentList);
+                opportunities, investmentList);
         if (!currentInvests.isEmpty()) {
             for(Investment inv : currentInvests){
                 FinSmartInvestorParked investorThread = new FinSmartInvestorParked(inv, loginJSON, queueStructure,
@@ -78,7 +77,6 @@ public class FinSmartSeekerParked extends Thread {
                 queueStructure.getInvestmentList().add(inv);
             }
         }
-        System.out.println(Thread.currentThread().getName() + "Seeker:" + getTime() + "Parked list completed");
     }
 
 }

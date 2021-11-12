@@ -36,7 +36,7 @@ public class FinSmartInvestorParked extends Thread {
 
     @Override
     public void run() {
-        if(this.scheduleTime != null) {
+        /*if(this.scheduleTime != null) {
             System.out.println(Thread.currentThread().getName() + ":Investor - scheduled - " + getTime());
             try {
                 TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime)-800);
@@ -45,9 +45,8 @@ public class FinSmartInvestorParked extends Thread {
                 flag = false;
             }
             this.scheduleTime = null;
-        }
+        }*/
         if(investment.getOpportunity() != null && !Thread.currentThread().isInterrupted() && flag){
-            System.out.println(Thread.currentThread().getName()+"Invest:"+getTime()+investment.getInvoiceNumber()+ " - STARTED");
             Future<Investment> future = poolSubmit.submit(callable);
             try {
                 if(future.get() !=  null){
@@ -70,32 +69,43 @@ public class FinSmartInvestorParked extends Thread {
         public Investment call() {
             ResponseJSON responseJSON;
             double actualAmount;
-            responseJSON = postToFinSmart(investment.getAmount(),investment,loginJSON);
-            actualAmount = investment.getAmount();
-            while(responseJSON.getMessage().replace('"',' ').equals(notPublished) &&
-                    !Thread.currentThread().isInterrupted()){
+            if(scheduleTime != null) {
+                System.out.println(Thread.currentThread().getName() + ":Thread Investor - scheduled - " + getTime());
                 try {
-                    Thread.sleep(100);
+                    TimeUnit.MILLISECONDS.sleep(timesDiff(scheduleTime)-1150);
                 } catch (InterruptedException e) {
-                    System.out.println(Thread.currentThread().getName()+"Submit:"+getTime()+investment.getInvoiceNumber()+ " - Stopped");
+                    System.out.println(Thread.currentThread().getName() + ":Thread Investor - was awakened - " + getTime());
+                    flag = false;
                 }
-                responseJSON = postToFinSmart(investment.getAmount(),investment,loginJSON);
+                scheduleTime = null;
             }
-            if (responseJSON.getMessage().replace('"',' ').equals(amountBigger)
-                    && !Thread.currentThread().isInterrupted()){
-                investment = updateOpportunity(loginJSON,investment);
-                responseJSON = postToFinSmart(investment.getOpportunity().getAvailableBalanceAmount(),
-                        investment, loginJSON);
-                actualAmount = investment.getOpportunity().getAvailableBalanceAmount();
-                investment = updateInvestment(investment, responseJSON, 4);
-                investment.setAdjustedAmount(actualAmount);
-            } else investment = updateInvestment(investment, responseJSON, 1);
-
+            if(flag) {
+                responseJSON = postToFinSmart(investment.getAmount(), investment, loginJSON);
+                actualAmount = investment.getAmount();
+                while (responseJSON.getMessage().replace('"', ' ').equals(notPublished) &&
+                        !Thread.currentThread().isInterrupted()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        System.out.println(Thread.currentThread().getName() + "Submit:" + getTime() + investment.getInvoiceNumber() + " - Stopped");
+                    }
+                    responseJSON = postToFinSmart(investment.getAmount(), investment, loginJSON);
+                }
+                if (responseJSON.getMessage().replace('"', ' ').equals(amountBigger)
+                        && !Thread.currentThread().isInterrupted()) {
+                    investment = updateOpportunity(loginJSON, investment);
+                    responseJSON = postToFinSmart(investment.getOpportunity().getAvailableBalanceAmount(),
+                            investment, loginJSON);
+                    actualAmount = investment.getOpportunity().getAvailableBalanceAmount();
+                    investment = updateInvestment(investment, responseJSON, 4);
+                    investment.setAdjustedAmount(actualAmount);
+                } else investment = updateInvestment(investment, responseJSON, 1);
+                System.out.println(Thread.currentThread().getName() + "Invest:" + getTime() +
+                        investment.getOpportunity().getPhysicalInvoices().get(0).getCode() + " " +
+                        investment.getOpportunity().getDebtor().getCompanyName() + " STATUS: " +
+                        investment.getStatus() + " MSG:" + investment.getMessage() + " Amount:" + actualAmount);
+            }
             investment.setCompleted(true);
-            System.out.println(Thread.currentThread().getName()+"Invest:"+getTime()+
-                    investment.getOpportunity().getPhysicalInvoices().get(0).getCode()+" "+
-                    investment.getOpportunity().getDebtor().getCompanyName()+" STATUS: "+
-                    investment.getStatus()+ " MSG:"+investment.getMessage()+" Amount:"+actualAmount);
             return investment;
         }
     };
