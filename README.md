@@ -11,6 +11,18 @@ Web App Summary: This is a web application was created to invest on customer inv
 - Frontend: JSP, Websockets, HTML, CSS, Javascript
 - Backend: Java 11, Spring Boot, Maven, JpaRepository, PostgresSQL
 
-
-IMAGE
+**Dashboard and investment portal**
 ![alt text](src/main/resources/images/Dashboard.jpg)
+
+**Login page**
+![alt text](src/main/resources/images/login.jpg)
+
+**Last Invesments Status**
+![alt text](src/main/resources/images/LastInvestments.jpg)
+
+**List of historical and current Invesments**
+![alt text](src/main/resources/images/ListOfInvestments.jpg)
+
+**Javascript ROI Calculator**
+
+<img alt="alt text" src="src/main/resources/images/Tool.jpg" width="260"/>
