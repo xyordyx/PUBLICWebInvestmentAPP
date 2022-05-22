@@ -7,7 +7,7 @@ function connect() {
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/finSmart/investments', function (data) {
+        stompClient.subscribe('/investmentAPP/investments', function (data) {
             console.log(data);
             processData(JSON.parse(data.body));
         });
@@ -24,7 +24,7 @@ function disconnect() {
 function processData(data) {
     if(data.investmentList.length !== 0){
         for (i = 0; i < data.investmentList.length; i++) {
-            if(data.system == "HMFINSMART"){
+            if(data.system == "HMinvestmentAPP"){
                 if(data.investmentList[i].status == "cancelled"){
                     document.getElementById('card_'+data.investmentList[i].invoiceNumber)
                         .setAttribute("class", "card redial-border-light redial-shadow redial-bg-goog");

@@ -4,10 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.gmp</groupId>
-  <artifactId>finsmartAPP</artifactId>
+  <artifactId>investmentAPPAPP</artifactId>
   <version>1.0.1-SNAPSHOT</version>
 
-  <name>finsmartAPP</name>
+  <name>investmentAPPAPP</name>
   <packaging>war</packaging>
 
   <parent>
@@ -256,7 +256,7 @@
     </repository>
   </repositories>
   <build>
-    <finalName>finsmartAPP</finalName>
+    <finalName>investmentAPPAPP</finalName>
     <resources>
       <resource>
         <directory>src/main/resources</directory>

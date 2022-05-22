@@ -10,7 +10,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Finsmart APP - Investmet Summary</title>
+    <title>investmentAPP APP - Investmet Summary</title>
     <link rel="icon" href="${contextPath}/resources/s2/dist/images/favicon.ico" />
     <!--Plugin CSS-->
     <link href="${contextPath}/resources/s2/dist/css/plugins.min.css" rel="stylesheet">
@@ -20,7 +20,7 @@
     <script src="${contextPath}/resources/s2/dist/js/jquery-3.5.1.min.js"></script>
     <script src="${contextPath}/resources/s2/dist/js/sockjs-0.3.4.js"></script>
     <script src="${contextPath}/resources/s2/dist/js/stomp.js"></script>
-    <script src="${contextPath}/resources/s2/dist/js/finSmart.js"></script>
+    <script src="${contextPath}/resources/s2/dist/js/investmentAPP.js"></script>
 </head>
 <body>
 
@@ -69,7 +69,7 @@
                             </div>
                         </div>
                     </c:forEach>
-                    <button onclick="stopTransactions()" class="btn btn-lg btn-block btn-outline-primary cancelFinSmart" id="cancelBtn"> Cancel </button>
+                    <button onclick="stopTransactions()" class="btn btn-lg btn-block btn-outline-primary cancelinvestmentAPP" id="cancelBtn"> Cancel </button>
                     <button onclick="returnToApp()" class="btn btn-lg btn-block btn-outline-info" id="return" style="visibility:hidden;"> Back </button>
                 </div>
             </div>

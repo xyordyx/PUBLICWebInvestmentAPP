@@ -10,7 +10,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Finsmart APP Analysis</title>
+    <title>investmentAPP APP Analysis</title>
     <link rel="icon" href="${contextPath}/resources/s2/dist/images/favicon.ico" />
 
     <!--Plugin CSS-->
@@ -29,7 +29,7 @@
         <div class="row">
             <div class="col-12 col-lg-3 col-xl-2 align-self-center">
                 <div class="site-logo">
-                    <a class="navbar-brand" title="Designed by GMP" data-placement="bottom" data-toggle="tooltip" href="/finsmart">FINSMART APP</a>
+                    <a class="navbar-brand" title="Designed by GMP" data-placement="bottom" data-toggle="tooltip" href="/investmentAPP">investmentAPP APP</a>
                 </div>
                 <div class="navbar-header">
                     <button type="button" id="sidebarCollapse" class="navbar-btn bg-transparent float-right">
@@ -87,7 +87,7 @@
     <nav id="sidebar" class="card redial-border-light redial-shadow mb-4">
         <div class="sidebar-scrollarea">
             <ul class="metismenu list-unstyled mb-0" id="menu">
-                <li><a href="/finsmart"><i class="fa fa-rocket pr-2"></i> Finsmart</a></li>
+                <li><a href="/investmentAPP"><i class="fa fa-rocket pr-2"></i> investmentAPP</a></li>
                 <li><a href="#" data-toggle="modal" data-target="#actualInvestments"><i class="icofont icofont-pie pr-1"></i>
                     Investments in Progress</a></li>
                 <li><a href="#" data-toggle="modal" data-target="#finalizedInv"><i class="fa fa-calendar-check-o pr-1"></i>

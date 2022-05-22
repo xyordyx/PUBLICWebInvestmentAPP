@@ -53,11 +53,11 @@
                 <%
                     ArrayList<String> posts=(ArrayList<String>) request.getAttribute("roles");
                     for (String role: posts) {
-                        if(role.equals("FINSMART_PRIVILEGE")){
+                        if(role.equals("investmentAPP_PRIVILEGE")){
                 %>
                 <div class="col-12 col-sm-6 col-xl-3 mb-4">
                     <div class="gallery card bg-white">
-                        <a href="/finsmart"><img src="${contextPath}/resources/s2/dist/images/logo-finsmart2.png"  data-gallery="example-gallery" alt="" class="img-fluid rounded"></a>
+                        <a href="/investmentAPP"><img src="${contextPath}/resources/s2/dist/images/logo-investmentAPP2.png"  data-gallery="example-gallery" alt="" class="img-fluid rounded"></a>
                     </div>
                 </div>
                 <% } if(role.equals("FACTUREDO_PRIVILEGE")){ %>

@@ -87,7 +87,7 @@
     <nav id="sidebar" class="card redial-border-light redial-shadow mb-4">
         <div class="sidebar-scrollarea">
             <ul class="metismenu list-unstyled mb-0" id="menu">
-                <li class="active"><a href="/finsmart" class="text-warning"><i class="fa fa-sheqel pr-2"></i> Facturedo</a></li>
+                <li class="active"><a href="/investmentAPP" class="text-warning"><i class="fa fa-sheqel pr-2"></i> Facturedo</a></li>
                 <li><a href="#" data-toggle="modal" data-target="#actualInvestments"><i class="icofont icofont-pie pr-1"></i>
                     Investments in Progress</a></li>
                 <li><a href="#" data-toggle="modal" data-target="#finalizedInv"><i class="fa fa-calendar-check-o pr-1"></i>

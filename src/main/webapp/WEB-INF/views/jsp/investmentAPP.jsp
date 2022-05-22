@@ -11,7 +11,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HM Viking APP - Finsmart</title>
+    <title>HM Viking APP - investmentAPP</title>
     <link rel="icon" href="${contextPath}/resources/s2/dist/images/favicon.ico" />
 
     <!--Plugin CSS-->
@@ -65,7 +65,7 @@
                                 </a>
                                 <ul class="dropdown-menu border-bottom-0 rounded-0 py-0">
                                     <li><a class="dropdown-item py-2" href="/userUpdate"><i class="fa fa-cog pr-2"></i> User Profile</a></li>
-                                    <li><a class="dropdown-item py-2" href="/smartUserProfile"><i class="lnr lnr-location pr-2"></i> Finsmart Profile</a></li>
+                                    <li><a class="dropdown-item py-2" href="/smartUserProfile"><i class="lnr lnr-location pr-2"></i> investmentAPP Profile</a></li>
                                     <li><a class="dropdown-item py-2" onclick="document.forms['logoutForm'].submit()"><i class="fa fa-sign-out pr-2"></i> logout</a></li>
                                 </ul>
                             </li>
@@ -90,7 +90,7 @@
     <nav id="sidebar" class="card redial-border-light redial-shadow mb-4">
         <div class="sidebar-scrollarea">
             <ul class="metismenu list-unstyled mb-0" id="menu">
-                <li class="active"><a href="/finsmart" class="text-warning"><i class="fa fa-rocket pr-2"></i> Finsmart</a></li>
+                <li class="active"><a href="/investmentAPP" class="text-warning"><i class="fa fa-rocket pr-2"></i> investmentAPP</a></li>
                 <li><a href="#" data-toggle="modal" data-target="#actualInvestments"><i class="icofont icofont-pie pr-1"></i>
                     Investments in Progress</a></li>
                 <li><a href="#" data-toggle="modal" data-target="#finalizedInv"><i class="fa fa-calendar-check-o pr-1"></i>
@@ -108,12 +108,12 @@
         <div class="row">
             <div class="col-sm-12">
                 <!--INVESMENT FORM-->
-                <img src="${contextPath}/resources/s2/dist/images/logo-finsmart.png" height="65"  alt="" />
+                <img src="${contextPath}/resources/s2/dist/images/logo-investmentAPP.png" height="65"  alt="" />
                 <div class="row">
                     <div class="col-12 col-md-12 mb-4 col-xl-10 center-block">
                         <div class="card redial-border-light redial-bg-secondry-light redial-shadow mb-4">
                             <div class="card-body">
-                                <form id="bookForm" name="bookForm" action="finsmart" method="POST" class="form-horizontal">
+                                <form id="bookForm" name="bookForm" action="investmentAPP" method="POST" class="form-horizontal">
                                     <%
                                         if ("true".equals(request.getParameter("error"))) {
                                     %>
@@ -451,7 +451,7 @@
                                             <tr class="redial-bg-primary text-white">
                                                 <th scope="col">Company</th>
                                                 <th scope="col">Payment Date</th>
-                                                <th scope="col">Creation Date</th>
+                                                <th scope="col">Creation DainvestmentFormte</th>
                                                 <th scope="col">Days Remaining</th>
                                                 <th scope="col">Amount</th>
                                                 <th scope="col">Profit</th>
