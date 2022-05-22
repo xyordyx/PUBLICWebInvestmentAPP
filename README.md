@@ -13,4 +13,4 @@ Web App Summary: This is a web application was created to invest on customer inv
 
 
 IMAGE
-![alt text](http://url/to/img.png)
+![alt text](src/main/resources/images/Dashboard.jpg)
